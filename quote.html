@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Calculator - 313 Student Protection Center</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="quote.css">
+</head>
+<body>
+    <div class="form-container">
+        <p class="form-title">Tuition Travel Protection Plans</p>
+        <h1>QUOTE CALCULATOR</h1>
+
+        <form id="quote-form">
+            <fieldset>
+                <legend>Coverage Plan Options <span class="required">(Required)</span></legend>
+                <div class="plan-options">
+                    <div class="plan-option">
+                        <input type="radio" id="plan-college" name="coverage_plan" value="college" required>
+                        <label for="plan-college">
+                            <img src="https://images.pexels.com/photos/207692/pexels-photo-207692.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Group of diverse college students">
+                            EIP International College & University Plan
+                        </label>
+                    </div>
+                    <div class="plan-option">
+                        <input type="radio" id="plan-k12" name="coverage_plan" value="k12" required>
+                        <label for="plan-k12">
+                            <img src="https://images.pexels.com/photos/1462630/pexels-photo-1462630.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Group of K-12 students walking">
+                            EIP International K-12 Plan
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="plan-details-links">
+                <a href="#">REVIEW EIP International K-12 Plan Details</a>
+                <a href="#">REVIEW EIP International College & University Plan Details</a>
+                <p>Enrollment in the plan must be before the covered Academic Period begins</p>
+            </div>
+
+            <div class="form-group">
+                <label for="coverage-amount">Plan Coverage Amount <span class="required">(Required)</span></label>
+                <input type="number" id="coverage-amount" name="coverage_amount" min="100" max="50000" placeholder="Please enter a number from 100 to 50000" required>
+                <p class="field-description">(Trip Cost includes tuition, room and board, travel expenses. Up to $50,000 USD max)</p>
+            </div>
+
+            <fieldset class="form-group">
+                <legend>Include Optional Academic Period Interrupt For Any Reason (IFAR) <span class="required">(Required)</span></legend>
+                <div>
+                    <input type="radio" id="ifar-yes" name="ifar" value="yes" required>
+                    <label for="ifar-yes">Yes</label>
+                </div>
+                <div>
+                    <input type="radio" id="ifar-no" name="ifar" value="no" required>
+                    <label for="ifar-no">No</label>
+                </div>
+                <p class="field-description">This Optional Coverage must be purchased 30 days prior to the start of the covered Academic Period</p>
+            </fieldset>
+
+            <div class="form-group">
+                <label for="departure-date">Departure date from home country <span class="required">(Required)</span></label>
+                <input type="date" id="departure-date" name="departure_date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="start-date">First day of school for the Academic Period this coverage applies to <span class="required">(Required)</span></label>
+                <input type="date" id="start-date" name="start_date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="end-date">Last day of school for the Academic Period this coverage applies to <span class="required">(Required)</span></label>
+                <input type="date" id="end-date" name="end_date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="citizenship">Country of Citizenship <span class="required">(Required)</span></label>
+                <select id="citizenship" name="citizenship" required>
+                    <option value="">Select a country</option>
+                    <option value="Albania">Albania</option>
+                    <option value="Brazil">Brazil</option>
+                    <option value="Canada">Canada</option>
+                    <option value="China">China</option>
+                    <option value="Germany">Germany</option>
+                    <option value="India">India</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Mexico">Mexico</option>
+                    <option value="South Korea">South Korea</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="United States">United States</option>
+                    <option value="Other">Other</option>
+                </select>
+                <p class="field-description">If your country is not an option above, the policy is not available in your country.</p>
+            </div>
+
+            <div class="quote-total">
+                <p>Total Premium Quote:</p>
+                <p id="total-premium">$0.00</p>
+            </div>
+
+            <button type="submit" class="btn-purchase">Purchase Now</button>
+        </form>
+    </div>
+    <script src="quote.js"></script>
+</body>
+</html>
