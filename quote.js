@@ -34,6 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle form submission
     form.addEventListener('submit', (e) => {
         e.preventDefault(); // Prevent actual submission for this demo
-        alert(`Thank you for your interest! Your premium is ${totalPremiumElem.textContent}.`);
+        alert(`관심을 가져주셔서 감사합니다! 예상 보험료는 ${totalPremiumElem.textContent} 입니다. (결제 예행 연습 완료)`);
     });
 });

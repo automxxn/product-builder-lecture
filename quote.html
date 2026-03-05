@@ -1,104 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quote Calculator - 313 Student Protection Center</title>
+    <title>보험료 계산기 - 313 Student Protection Center</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="quote.css">
 </head>
 <body>
     <div class="form-container">
-        <p class="form-title">Tuition Travel Protection Plans</p>
-        <h1>QUOTE CALCULATOR</h1>
+        <p class="form-title">학비 여행자 보호 플랜 (Tuition Travel Protection Plans)</p>
+        <h1>보험료 계산기</h1>
 
         <form id="quote-form">
             <fieldset>
-                <legend>Coverage Plan Options <span class="required">(Required)</span></legend>
+                <legend>보장 플랜 옵션 <span class="required">(필수)</span></legend>
                 <div class="plan-options">
                     <div class="plan-option">
                         <input type="radio" id="plan-college" name="coverage_plan" value="college" required>
                         <label for="plan-college">
-                            <img src="https://images.pexels.com/photos/207692/pexels-photo-207692.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Group of diverse college students">
-                            EIP International College & University Plan
+                            <img src="https://images.pexels.com/photos/207692/pexels-photo-207692.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="대학생 그룹">
+                            EIP 국제 대학 및 대학교 플랜 (College & University Plan)
                         </label>
                     </div>
                     <div class="plan-option">
                         <input type="radio" id="plan-k12" name="coverage_plan" value="k12" required>
                         <label for="plan-k12">
-                            <img src="https://images.pexels.com/photos/1462630/pexels-photo-1462630.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Group of K-12 students walking">
-                            EIP International K-12 Plan
+                            <img src="https://images.pexels.com/photos/1462630/pexels-photo-1462630.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="K-12 학생 그룹">
+                            EIP 국제 K-12 플랜 (Elementary, Middle, High School)
                         </label>
                     </div>
                 </div>
             </fieldset>
 
             <div class="plan-details-links">
-                <a href="#">REVIEW EIP International K-12 Plan Details</a>
-                <a href="#">REVIEW EIP International College & University Plan Details</a>
-                <p>Enrollment in the plan must be before the covered Academic Period begins</p>
+                <a href="#">EIP 국제 K-12 플랜 상세 내용 확인</a>
+                <a href="#">EIP 국제 대학 및 대학교 플랜 상세 내용 확인</a>
+                <p>보험 가입은 보장 대상 학기가 시작되기 전에 완료되어야 합니다.</p>
             </div>
 
             <div class="form-group">
-                <label for="coverage-amount">Plan Coverage Amount <span class="required">(Required)</span></label>
-                <input type="number" id="coverage-amount" name="coverage_amount" min="100" max="50000" placeholder="Please enter a number from 100 to 50000" required>
-                <p class="field-description">(Trip Cost includes tuition, room and board, travel expenses. Up to $50,000 USD max)</p>
+                <label for="coverage-amount">보장 금액 설정 (Plan Coverage Amount) <span class="required">(필수)</span></label>
+                <input type="number" id="coverage-amount" name="coverage_amount" min="100" max="50000" placeholder="100에서 50,000 사이의 숫자를 입력하세요" required>
+                <p class="field-description">(여행 비용에는 학비, 숙식비, 여행 경비가 포함됩니다. 최대 $50,000 USD까지 가능)</p>
             </div>
 
             <fieldset class="form-group">
-                <legend>Include Optional Academic Period Interrupt For Any Reason (IFAR) <span class="required">(Required)</span></legend>
+                <legend>임의 중단 보장 옵션 포함 (IFAR - Interrupt For Any Reason) <span class="required">(필수)</span></legend>
                 <div>
                     <input type="radio" id="ifar-yes" name="ifar" value="yes" required>
-                    <label for="ifar-yes">Yes</label>
+                    <label for="ifar-yes">예 (Yes)</label>
                 </div>
                 <div>
                     <input type="radio" id="ifar-no" name="ifar" value="no" required>
-                    <label for="ifar-no">No</label>
+                    <label for="ifar-no">아니오 (No)</label>
                 </div>
-                <p class="field-description">This Optional Coverage must be purchased 30 days prior to the start of the covered Academic Period</p>
+                <p class="field-description">이 선택 보장은 해당 학기 시작 30일 전까지 구매해야 합니다.</p>
             </fieldset>
 
             <div class="form-group">
-                <label for="departure-date">Departure date from home country <span class="required">(Required)</span></label>
+                <label for="departure-date">출국 예정일 <span class="required">(필수)</span></label>
                 <input type="date" id="departure-date" name="departure_date" required>
             </div>
 
             <div class="form-group">
-                <label for="start-date">First day of school for the Academic Period this coverage applies to <span class="required">(Required)</span></label>
+                <label for="start-date">학기 시작일 (개강일) <span class="required">(필수)</span></label>
                 <input type="date" id="start-date" name="start_date" required>
             </div>
 
             <div class="form-group">
-                <label for="end-date">Last day of school for the Academic Period this coverage applies to <span class="required">(Required)</span></label>
+                <label for="end-date">학기 종료일 (종강일) <span class="required">(필수)</span></label>
                 <input type="date" id="end-date" name="end_date" required>
             </div>
 
             <div class="form-group">
-                <label for="citizenship">Country of Citizenship <span class="required">(Required)</span></label>
+                <label for="citizenship">국적 <span class="required">(필수)</span></label>
                 <select id="citizenship" name="citizenship" required>
-                    <option value="">Select a country</option>
-                    <option value="Albania">Albania</option>
-                    <option value="Brazil">Brazil</option>
-                    <option value="Canada">Canada</option>
-                    <option value="China">China</option>
-                    <option value="Germany">Germany</option>
-                    <option value="India">India</option>
-                    <option value="Japan">Japan</option>
-                    <option value="Mexico">Mexico</option>
-                    <option value="South Korea">South Korea</option>
-                    <option value="United Kingdom">United Kingdom</option>
-                    <option value="United States">United States</option>
-                    <option value="Other">Other</option>
+                    <option value="">국가를 선택하세요</option>
+                    <option value="South Korea" selected>대한민국 (South Korea)</option>
+                    <option value="United States">미국 (United States)</option>
+                    <option value="China">중국 (China)</option>
+                    <option value="Japan">일본 (Japan)</option>
+                    <option value="Canada">캐나다 (Canada)</option>
+                    <option value="United Kingdom">영국 (United Kingdom)</option>
+                    <option value="Other">기타</option>
                 </select>
-                <p class="field-description">If your country is not an option above, the policy is not available in your country.</p>
+                <p class="field-description">선택 목록에 국가가 없는 경우, 해당 국가에서는 보험 이용이 불가능합니다.</p>
             </div>
 
             <div class="quote-total">
-                <p>Total Premium Quote:</p>
+                <p>예상 총 보험료 (Total Premium Quote):</p>
                 <p id="total-premium">$0.00</p>
             </div>
 
-            <button type="submit" class="btn-purchase">Purchase Now</button>
+            <button type="submit" class="btn-purchase">지금 구매하기 (결제 예행 연습)</button>
         </form>
     </div>
     <script src="quote.js"></script>
