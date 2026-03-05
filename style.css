@@ -11,6 +11,7 @@
     --card-bg: #fff;
     --btn-bg: #1a73e8;
     --btn-text: white;
+    --separator-color: #ccc;
 }
 
 [data-theme='dark'] {
@@ -25,6 +26,7 @@
     --card-bg: #1e1e1e;
     --btn-bg: #3085fe;
     --btn-text: #ffffff;
+    --separator-color: #444;
 }
 
 /* General Body Styling */
@@ -42,15 +44,16 @@ header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 30px 50px;
+    padding: 40px 50px 20px;
     background-color: var(--header-bg);
     border-bottom: 1px solid var(--header-border);
+    position: relative;
 }
 
 .logo {
     font-size: 28px;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     text-align: center;
 }
 
@@ -65,32 +68,43 @@ nav ul {
 }
 
 nav li {
-    margin: 0 15px;
+    margin: 0;
 }
 
 nav a {
     text-decoration: none;
     color: var(--nav-link-color);
     font-size: 16px;
-    padding: 5px 10px;
+    padding: 10px 25px; /* Increased side padding for more spacing */
     border-radius: 5px;
     transition: background-color 0.3s, color 0.3s;
+    font-weight: normal;
 }
 
-nav a.active {
-    color: #1a73e8; /* Changed from red to blue for a cleaner look, can revert if needed */
+nav a:hover {
+    background-color: var(--header-border);
 }
 
-/* Theme Toggle Button */
+/* Separator styling */
+.separator {
+    width: 1px;
+    height: 15px;
+    background-color: var(--separator-color);
+    display: inline-block;
+}
+
+/* Theme Toggle Button - Moved to top right */
 #theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
     background: none;
     border: 1px solid var(--header-border);
     color: var(--text-color);
-    padding: 8px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 14px;
-    margin-left: 10px;
+    font-size: 13px;
     transition: all 0.3s;
 }
 
@@ -118,7 +132,7 @@ nav a.active {
 .cta-buttons {
     display: flex;
     justify-content: center;
-    gap: 30px; /* Increased gap for more space between buttons */
+    gap: 30px;
 }
 
 .cta-buttons .btn,
@@ -127,7 +141,7 @@ nav a.active {
     color: var(--btn-text);
     border: none;
     padding: 15px 0;
-    width: 250px; /* Unified width for both boxes */
+    width: 250px;
     font-size: 18px;
     border-radius: 8px;
     cursor: pointer;
@@ -177,7 +191,7 @@ footer {
 /* Responsive Design */
 @media (max-width: 768px) {
     header {
-        padding: 20px;
+        padding: 60px 20px 20px; /* More top padding for absolute toggle button */
     }
 
     nav ul {
@@ -186,12 +200,16 @@ footer {
     }
 
     nav li {
-        margin: 8px 0;
+        margin: 5px 0;
+    }
+
+    .separator {
+        display: none; /* Hide separators on mobile */
     }
 
     #theme-toggle {
-        margin-left: 0;
-        margin-top: 10px;
+        top: 10px;
+        right: 10px;
     }
 
     .hero {
