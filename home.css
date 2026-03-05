@@ -1,0 +1,40 @@
+/* home.css */
+
+/* General table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+thead {
+    background-color: #004466;
+    color: white;
+}
+
+/* Section styling */
+.intro, .partner-info, .signup-process, .quick-links {
+    margin-bottom: 20px;
+}
+
+.intro h1, .intro h2, .partner-info h2, .signup-process h2 {
+    margin-bottom: 10px;
+}
+
+.signup-process ol {
+    list-style-position: inside;
+    padding-left: 0;
+}
+
+.quick-links p {
+    margin: 5px 0;
+}
