@@ -40,16 +40,18 @@ body {
 /* Header */
 header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    padding: 20px 50px;
+    padding: 30px 50px;
     background-color: var(--header-bg);
     border-bottom: 1px solid var(--header-border);
 }
 
 .logo {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 nav ul {
@@ -58,10 +60,12 @@ nav ul {
     padding: 0;
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 nav li {
-    margin-left: 20px;
+    margin: 0 15px;
 }
 
 nav a {
@@ -74,7 +78,7 @@ nav a {
 }
 
 nav a.active {
-    color: red;
+    color: #1a73e8; /* Changed from red to blue for a cleaner look, can revert if needed */
 }
 
 /* Theme Toggle Button */
@@ -86,7 +90,7 @@ nav a.active {
     border-radius: 20px;
     cursor: pointer;
     font-size: 14px;
-    margin-left: 20px;
+    margin-left: 10px;
     transition: all 0.3s;
 }
 
@@ -111,20 +115,27 @@ nav a.active {
     margin-bottom: 40px;
 }
 
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Increased gap for more space between buttons */
+}
+
 .cta-buttons .btn,
 .cta-buttons button {
     background-color: var(--btn-bg);
     color: var(--btn-text);
     border: none;
-    padding: 15px 30px;
+    padding: 15px 0;
+    width: 250px; /* Unified width for both boxes */
     font-size: 18px;
     border-radius: 8px;
     cursor: pointer;
-    margin: 0 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
     transition: all 0.2s ease-in-out;
     text-decoration: none;
     display: inline-block;
+    text-align: center;
 }
 
 .cta-buttons .btn:hover,
@@ -166,18 +177,16 @@ footer {
 /* Responsive Design */
 @media (max-width: 768px) {
     header {
-        flex-direction: column;
         padding: 20px;
     }
 
     nav ul {
         flex-direction: column;
-        margin-top: 20px;
+        margin-top: 10px;
     }
 
     nav li {
-        margin: 10px 0;
-        margin-left: 0;
+        margin: 8px 0;
     }
 
     #theme-toggle {
@@ -191,6 +200,18 @@ footer {
 
     .hero h1 {
         font-size: 36px;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .cta-buttons .btn,
+    .cta-buttons button {
+        width: 100%;
+        max-width: 300px;
     }
 
     .footer-content {
