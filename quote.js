@@ -1,6 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('quote-form');
     const totalPremiumElem = document.getElementById('total-premium');
+    const coverageAmountInput = document.getElementById('coverage-amount');
+
+    // Strictly allow only numbers (0-9)
+    // Prevents non-numeric keys and handles IME (Korean) better
+    coverageAmountInput.addEventListener('keydown', (e) => {
+        const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+        if (allowedKeys.includes(e.key)) return;
+        
+        // Prevent any key that isn't a number
+        if (!/^[0-9]$/.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+
+    coverageAmountInput.addEventListener('input', (e) => {
+        // Clean any non-numeric characters that might have bypassed keydown (e.g., IME, Drag & Drop)
+        let value = e.target.value.replace(/[^0-9]/g, '');
+        
+        // Remove leading zeros
+        if (value.length > 1 && value.startsWith('0')) {
+            value = value.replace(/^0+/, '');
+        }
+        
+        // Ensure max limit
+        if (value !== '' && parseInt(value) > 50000) {
+            value = "50000";
+        }
+        
+        e.target.value = value;
+        calculatePremium();
+    });
+
+    coverageAmountInput.addEventListener('paste', (e) => {
+        const pasteData = e.clipboardData.getData('text');
+        if (!/^\d+$/.test(pasteData)) {
+            e.preventDefault();
+        }
+    });
 
     const calculatePremium = () => {
         const plan = form.elements.coverage_plan.value;
@@ -29,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Calculate on any form change
     form.addEventListener('change', calculatePremium);
-    form.addEventListener('input', calculatePremium);
 
     // Handle form submission
     form.addEventListener('submit', (e) => {
