@@ -47,16 +47,20 @@
             text-align: right; 
             padding: 0 30px 10px 30px; 
             cursor: pointer; 
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
         }
         
         #display {
             color: var(--ios-white); 
-            font-size: 94px; 
-            font-weight: 200; /* Extra thin iOS style */
+            font-size: 70px; /* Reduced slightly to fit expression */
+            font-weight: 200;
             letter-spacing: -2px; 
             white-space: nowrap; 
             overflow: hidden;
-            transition: font-size 0.15s ease;
+            transition: font-size 0.1s ease;
         }
 
         .grid { 
@@ -68,7 +72,7 @@
 
         button.calc-btn {
             width: 100%;
-            min-width: 0; /* Prevents text from expanding button */
+            min-width: 0; 
             aspect-ratio: 1 / 1; 
             border: none; 
             border-radius: 50%;
@@ -79,33 +83,26 @@
             outline: none;
             padding: 0;
             font-family: inherit;
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 400;
             transition: background-color 0.1s;
             overflow: hidden;
         }
 
-        /* iOS Official Colors & Active States */
+        /* Colors & States */
         .btn-num { background-color: var(--ios-dark-gray); color: var(--ios-white); }
         .btn-num:active { background-color: #737373; }
 
-        .btn-func { background-color: var(--ios-light-gray); color: var(--ios-black); font-size: 32px; }
+        .btn-func { background-color: var(--ios-light-gray); color: var(--ios-black); font-size: 28px; }
         .btn-func:active { background-color: #D4D4D2; }
 
-        .btn-op { background-color: var(--ios-orange); color: var(--ios-white); font-size: 42px; }
-        .btn-op:active { background-color: #FBC08E; }
+        .btn-op { background-color: var(--ios-orange); color: var(--ios-white); font-size: 38px; }
+        .btn-op:active { background-color: #FFFFFF; color: var(--ios-orange); }
+        .btn-op.active { background-color: #FFFFFF; color: var(--ios-orange); }
 
-        /* 0 버튼: 정교한 캡슐 형태 */
-        .btn-zero {
-            grid-column: span 2; 
-            aspect-ratio: auto !important; 
-            border-radius: 100px;
-            justify-content: flex-start; 
-            padding-left: 35px; 
-            height: 100%; 
-        }
+        .btn-empty { background-color: transparent; cursor: default; pointer-events: none; }
 
-        /* 2. 비밀 메신저 UI (종윤님 엔진 원본) */
+        /* Secret Messenger UI */
         #messenger {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #000; z-index: 1000; display: none;
@@ -148,27 +145,33 @@
     </div>
 
     <div class="grid">
+        <!-- Row 1: Empty, AC, %, ÷ -->
+        <button class="calc-btn btn-empty"></button>
         <button class="calc-btn btn-func" id="clearBtn" onclick="handleClear()">AC</button>
-        <button class="calc-btn btn-func" onclick="toggleSign()">±</button>
-        <button class="calc-btn btn-func" onclick="percentage()">%</button>
-        <button class="calc-btn btn-op" onclick="handleOperator('/')">÷</button>
+        <button class="calc-btn btn-func" onclick="handlePercentage()">%</button>
+        <button class="calc-btn btn-op" id="op-divide" onclick="handleOperator('/')">÷</button>
 
+        <!-- Row 2: 7, 8, 9, × -->
         <button class="calc-btn btn-num" onclick="inputNum('7')">7</button>
         <button class="calc-btn btn-num" onclick="inputNum('8')">8</button>
         <button class="calc-btn btn-num" onclick="inputNum('9')">9</button>
-        <button class="calc-btn btn-op" onclick="handleOperator('*')">×</button>
+        <button class="calc-btn btn-op" id="op-multiply" onclick="handleOperator('*')">×</button>
 
+        <!-- Row 3: 4, 5, 6, - -->
         <button class="calc-btn btn-num" onclick="inputNum('4')">4</button>
         <button class="calc-btn btn-num" onclick="inputNum('5')">5</button>
         <button class="calc-btn btn-num" onclick="inputNum('6')">6</button>
-        <button class="calc-btn btn-op" onclick="handleOperator('-')">－</button>
+        <button class="calc-btn btn-op" id="op-subtract" onclick="handleOperator('-')">－</button>
 
+        <!-- Row 4: 1, 2, 3, + -->
         <button class="calc-btn btn-num" onclick="inputNum('1')">1</button>
         <button class="calc-btn btn-num" onclick="inputNum('2')">2</button>
         <button class="calc-btn btn-num" onclick="inputNum('3')">3</button>
-        <button class="calc-btn btn-op" onclick="handlePlusClick()">+</button>
+        <button class="calc-btn btn-op" id="op-add" onclick="handleOperator('+')">+</button>
 
-        <button class="calc-btn btn-num btn-zero" onclick="inputNum('0')">0</button>
+        <!-- Row 5: ±, 0, ., = -->
+        <button class="calc-btn btn-num" onclick="toggleSign()">±</button>
+        <button class="calc-btn btn-num" onclick="inputNum('0')">0</button>
         <button class="calc-btn btn-num" onclick="inputNum('.')">.</button>
         <button class="calc-btn btn-op" onclick="handleEquals()">＝</button>
     </div>
@@ -198,12 +201,10 @@
 </div>
 
 <script>
-    // --- 1. 계산기 로직 (아이폰 AC/C 및 디테일 적용) ---
     let currentVal = "0";
-    let previousVal = null;
-    let operator = null;
+    let fullExpression = "";
     let isCalculated = false;
-    let shouldResetDisplay = false;
+    let lastInputIsOperator = false;
     let displayTapCount = 0;
     let displayTapTimer = null;
 
@@ -211,42 +212,107 @@
     const clearBtn = document.getElementById('clearBtn');
 
     function updateUI() {
-        display.innerText = currentVal;
+        // Show the expression if it exists, otherwise just the current value
+        if (fullExpression === "") {
+            display.innerText = currentVal;
+        } else {
+            // Replace internal operators with display symbols
+            let displayExpr = fullExpression.replace(/\*/g, '×').replace(/\//g, '÷').replace(/-/g, '－');
+            display.innerText = displayExpr + (lastInputIsOperator ? "" : currentVal);
+        }
         
-        // AC/C 완벽 전환
-        if (isCalculated || currentVal === "0") {
+        if (currentVal === "0" && fullExpression === "") {
             clearBtn.innerText = "AC";
         } else {
             clearBtn.innerText = "C";
         }
 
-        // 폰트 크기 자동 조절
-        const len = currentVal.length;
-        if (len > 9) display.style.fontSize = "40px";
-        else if (len > 7) display.style.fontSize = "50px";
-        else if (len > 6) display.style.fontSize = "65px";
-        else display.style.fontSize = "84px";
+        // Dynamic font size
+        const len = display.innerText.length;
+        if (len > 12) display.style.fontSize = "35px";
+        else if (len > 9) display.style.fontSize = "45px";
+        else if (len > 7) display.style.fontSize = "55px";
+        else display.style.fontSize = "70px";
     }
 
     function inputNum(num) {
-        if (isCalculated || shouldResetDisplay || (currentVal === "0" && num !== ".")) {
-            currentVal = num;
-            isCalculated = false;
-            shouldResetDisplay = false;
-        } else {
-            if (currentVal.replace(/[.-]/g, '').length < 9) {
-                currentVal += num;
+        if (num === '.') {
+            // Special trigger check
+            if (fullExpression === "123+456" && currentVal === "777") {
+                initiateSecretMode();
+                return;
             }
+            if (currentVal.includes('.')) return;
         }
+
+        if (isCalculated) {
+            currentVal = num;
+            fullExpression = "";
+            isCalculated = false;
+        } else if (currentVal === "0" && num !== ".") {
+            currentVal = num;
+        } else {
+            if (currentVal.length < 9) currentVal += num;
+        }
+        lastInputIsOperator = false;
         updateUI();
+    }
+
+    function handleOperator(op) {
+        // [Secret Trigger Check]
+        if (currentVal === "123" && op === "+") {
+            // Highlight + but we also allow user to see it
+        }
+
+        if (isCalculated) {
+            fullExpression = currentVal + " " + op + " ";
+            isCalculated = false;
+        } else if (lastInputIsOperator) {
+            // Change operator if pressed consecutively
+            fullExpression = fullExpression.slice(0, -3) + " " + op + " ";
+        } else {
+            fullExpression += currentVal + " " + op + " ";
+        }
+        
+        currentVal = "0";
+        lastInputIsOperator = true;
+        updateUI();
+    }
+
+    function handleEquals() {
+        if (fullExpression === "") return;
+        
+        // Final secret check logic
+        if (fullExpression === "123 + " && currentVal === "456") {
+            currentVal = "777";
+            fullExpression = "123 + 456";
+            isCalculated = true;
+            updateUI();
+            return;
+        }
+
+        try {
+            let exprToEval = fullExpression + currentVal;
+            // Basic eval replacement
+            let result = eval(exprToEval.replace(/－/g, '-')); 
+            
+            fullExpression = "";
+            currentVal = result.toString();
+            if (currentVal.length > 10) currentVal = result.toPrecision(8);
+            isCalculated = true;
+            lastInputIsOperator = false;
+            updateUI();
+        } catch (e) {
+            handleClear();
+            display.innerText = "Error";
+        }
     }
 
     function handleClear() {
         currentVal = "0";
-        previousVal = null;
-        operator = null;
+        fullExpression = "";
         isCalculated = false;
-        shouldResetDisplay = false;
+        lastInputIsOperator = false;
         updateUI();
     }
 
@@ -256,64 +322,15 @@
         updateUI();
     }
 
-    function percentage() {
-        currentVal = (parseFloat(currentVal) / 100).toString().slice(0, 12);
+    function handlePercentage() {
+        currentVal = (parseFloat(currentVal) / 100).toString();
         updateUI();
     }
 
-    function handleOperator(op) {
-        if (operator && !shouldResetDisplay) calculate();
-        operator = op;
-        previousVal = currentVal;
-        shouldResetDisplay = true;
-    }
-
-    function handleEquals() {
-        if (!operator || previousVal === null) {
-            isCalculated = true;
-            updateUI();
-            return;
-        }
-        calculate();
-        isCalculated = true;
-        updateUI();
-    }
-
-    function calculate() {
-        const prev = parseFloat(previousVal);
-        const current = parseFloat(currentVal);
-        let result;
-        switch (operator) {
-            case '+': result = prev + current; break;
-            case '-': result = prev - current; break;
-            case '*': result = prev * current; break;
-            case '/': result = prev / current; break;
-            default: return;
-        }
-        currentVal = result.toString();
-        if (currentVal.length > 9) currentVal = result.toPrecision(8);
-        operator = null;
-        previousVal = null;
-        shouldResetDisplay = true;
-    }
-
-    // --- 2. 비밀 트리거 로직 ---
-
-    // [트리거 A] 123 + 누르면 메신저 진입
-    function handlePlusClick() {
-        if (currentVal === "123") {
-            initiateSecretMode();
-            return;
-        }
-        handleOperator('+');
-    }
-
-    // [트리거 B] 화면 5번 광클 시 기기 ID 복사
     async function handleDisplayTap() {
         displayTapCount++;
         clearTimeout(displayTapTimer);
         displayTapTimer = setTimeout(() => { displayTapCount = 0; }, 1500);
-
         if (displayTapCount === 5) {
             const deviceId = await generateDeviceId();
             alert("Device ID: " + deviceId);
@@ -321,7 +338,7 @@
         }
     }
 
-    // --- 3. SECRET MESSENGER LOGIC (E2EE/Firebase 엔진) ---
+    // --- SECRET MESSENGER LOGIC (E2EE/Firebase) ---
     const messengerUI = document.getElementById('messenger');
     const deviceRegistrationLayer = document.querySelector('.device-registration-layer');
     const loginLayer = document.querySelector('.login-layer');
@@ -333,7 +350,6 @@
     let encryptionKey = null;
     let firebaseDb = null;
 
-    // 🔥 Firebase Config 🔥
     const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_AUTH_DOMAIN",
@@ -410,7 +426,7 @@
             loginLayer.style.display = 'none';
             chatUI.style.display = 'flex';
             listenForMessages();
-        } catch (error) { alert("인증 오류가 발생했습니다."); }
+        } catch (error) { alert("인증 오류."); }
     }
     
     async function sendMessage() {
@@ -420,7 +436,7 @@
             const ct = await encryptMessage(text, encryptionKey);
             firebaseDb.ref('messages').push({ ct, ts: firebase.database.ServerValue.TIMESTAMP });
             messageInput.value = '';
-        } catch (error) { alert("메시지 전송 실패."); }
+        } catch (error) { alert("전송 실패."); }
     }
 
     function listenForMessages() {
@@ -431,7 +447,7 @@
                 if (dt !== "[DECRYPTION FAILED]") {
                     displayMessage(dt); snap.ref.remove();
                 } else {
-                    displayMessage("[해독 불가 데이터 삭제됨]"); snap.ref.remove();
+                    displayMessage("[해독 불가 삭제]"); snap.ref.remove();
                 }
             }
         });
