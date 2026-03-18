@@ -62,12 +62,14 @@
         .grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            gap: 14px; 
+            gap: 12px; 
             width: 100%;
+            justify-items: center; /* 버튼들을 가로 중앙 정렬 */
         }
 
         button.calc-btn {
             width: 100%;
+            max-width: 80px; /* 너무 커지는 것 방지 */
             aspect-ratio: 1 / 1; 
             border: none; 
             border-radius: 50%;
@@ -81,37 +83,14 @@
             font-family: inherit;
         }
 
-        /* iOS Button Colors & Text Sizes */
-        .btn-num { 
-            background-color: var(--btn-dark); 
-            color: var(--text-white); 
-            font-size: 36px; 
-            font-weight: 400; 
-        }
-        .btn-num:active { background-color: #737373; }
-
-        .btn-func { 
-            background-color: var(--btn-gray); 
-            color: var(--text-black); 
-            font-size: 32px; 
-            font-weight: 400; 
-        }
-        .btn-func:active { background-color: #D4D4D2; }
-
-        .btn-op { 
-            background-color: var(--btn-orange); 
-            color: var(--text-white); 
-            font-size: 40px; 
-            font-weight: 400; 
-        }
-        .btn-op:active { background-color: #FBC08E; color: var(--btn-orange); } /* Active state for operator */
-        
+        /* 0 버튼만 예외 처리: 가로로 길게 */
         .btn-zero {
             grid-column: span 2; 
-            aspect-ratio: auto; 
-            border-radius: 100px;
-            justify-content: flex-start; 
-            padding-left: 32px; 
+            max-width: 172px !important; /* 2칸 + 간격만큼 */
+            aspect-ratio: auto !important; 
+            border-radius: 100px !important;
+            justify-content: flex-start !important; 
+            padding-left: 28px !important; 
             height: 100%; 
         }
 
