@@ -6,9 +6,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>계산기</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
     <style>
+        /* 1. 완벽한 아이폰 UI 디자인 적용 */
         :root {
             --bg-black: #000000;
             --btn-dark: #333333;
@@ -16,193 +19,118 @@
             --btn-orange: #ff9f0a;
         }
 
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            user-select: none; 
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; }
         
         body { 
-            background-color: var(--bg-black); 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-end;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            padding-bottom: env(safe-area-inset-bottom, 20px);
+            background-color: var(--bg-black); margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: flex-end;
+            height: 100vh; width: 100vw;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
         }
 
-        /* 결과 화면 */
-        .display-container {
-            padding: 0 30px 10px;
-            text-align: right;
-            cursor: pointer;
+        .calc-container {
+            width: 100%; max-width: 414px; padding: 20px;
+            padding-bottom: env(safe-area-inset-bottom, 30px);
         }
+
+        .display-container { text-align: right; padding: 0 10px 10px; cursor: pointer; }
+        
         #display {
-            color: white;
-            font-size: 90px;
-            font-weight: 300;
-            letter-spacing: -2px;
-            white-space: nowrap;
-            overflow: hidden;
-            transition: font-size 0.15s ease;
+            color: white; font-size: 84px; font-weight: 200;
+            letter-spacing: -2px; white-space: nowrap; overflow: hidden;
+            transition: font-size 0.1s;
         }
 
-        /* 버튼 격자 */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            padding: 20px;
-        }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 
-        button {
-            aspect-ratio: 1;
-            border: none;
-            border-radius: 50%;
-            font-size: 36px;
-            font-weight: 400;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.2s, transform 0.1s ease;
-            cursor: pointer;
+        button.calc-btn {
+            aspect-ratio: 1; border: none; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: filter 0.1s, transform 0.1s;
             outline: none;
         }
 
-        button:active { 
-            filter: brightness(1.6); 
-            transform: scale(0.95);
-        }
+        button.calc-btn:active { filter: brightness(1.6); transform: scale(0.95); }
 
-        .btn-num { background-color: var(--btn-dark); color: white; }
-        .btn-func { background-color: var(--btn-gray); color: black; font-size: 30px; }
-        .btn-op { background-color: var(--btn-orange); color: white; font-size: 40px; }
+        .btn-num { background-color: var(--btn-dark); color: white; font-size: 36px; font-weight: 400; }
+        .btn-func { background-color: var(--btn-gray); color: black; font-size: 30px; font-weight: 400; }
+        .btn-op { background-color: var(--btn-orange); color: white; font-size: 40px; font-weight: 400; }
         
         .btn-zero {
-            grid-column: span 2;
-            aspect-ratio: auto;
-            border-radius: 100px;
-            justify-content: flex-start;
-            padding-left: 35px;
-            height: 100%;
+            grid-column: span 2; aspect-ratio: auto; border-radius: 100px;
+            justify-content: flex-start; padding-left: 30px; height: 100%;
         }
 
-        /* Secret Messenger UI */
+        /* 2. 비밀 메신저 UI (종윤님 엔진 원본 유지) */
         #messenger {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            z-index: 1000;
-            display: none;
-            flex-direction: column;
-            padding: 60px 20px 20px 20px;
-            color: #0f0;
-            font-family: 'SF Mono', 'Courier New', monospace;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000; z-index: 1000; display: none;
+            flex-direction: column; padding: 60px 20px 20px 20px;
+            color: #00ff41; font-family: 'SF Mono', 'Courier New', monospace;
         }
         #messenger h2 { text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
         .login-layer, .device-registration-layer {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 60%;
-            gap: 25px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 60%; gap: 25px;
         }
         .messenger-input {
-            width: 100%;
-            max-width: 320px;
-            padding: 15px;
-            background-color: #111;
-            border: 1px solid #0f0;
-            color: #0f0;
-            font-size: 18px;
-            text-align: center;
-            border-radius: 8px;
-            outline: none;
+            width: 100%; max-width: 320px; padding: 15px; background-color: #111;
+            border: 1px solid #00ff41; color: #00ff41; font-size: 18px;
+            text-align: center; border-radius: 8px; outline: none;
         }
         .messenger-button {
-            width: 100%;
-            max-width: 320px;
-            padding: 15px;
-            background-color: #0f0;
-            color: #000;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
+            width: 100%; max-width: 320px; padding: 15px; background-color: #00ff41;
+            color: #000; border: none; cursor: pointer; font-size: 18px;
+            font-weight: bold; border-radius: 8px;
         }
         #chat-ui { display: none; flex-direction: column; height: 100%; }
         #message-display {
-            flex-grow: 1;
-            overflow-y: auto;
-            border: 1px solid #0f0;
-            padding: 15px;
-            margin-bottom: 15px;
-            list-style: none;
-            border-radius: 8px;
+            flex-grow: 1; overflow-y: auto; border: 1px solid #00ff41;
+            padding: 15px; margin-bottom: 15px; list-style: none; border-radius: 8px;
         }
         #message-display li { margin-bottom: 10px; line-height: 1.4; word-break: break-all; }
         #message-form { display: flex; gap: 10px; }
         #exit-button {
-            position: absolute;
-            top: 40px;
-            right: 25px;
-            background: none;
-            border: none;
-            color: #0f0;
-            font-size: 35px;
-            cursor: pointer;
-        }
-
-        /* [Secret Layer from snippet] */
-        #secret-layer {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999; flex-direction: column; justify-content: center; align-items: center;
+            position: absolute; top: 40px; right: 25px; background: none; border: none;
+            color: #00ff41; font-size: 35px; cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-<div class="display-container" onclick="handleDisplayTap()">
-    <div id="display">0</div>
+<div class="calc-container">
+    <div class="display-container" onclick="handleDisplayTap()">
+        <div id="display">0</div>
+    </div>
+
+    <div class="grid">
+        <button class="calc-btn btn-func" id="clearBtn" onclick="handleClear()">AC</button>
+        <button class="calc-btn btn-func" onclick="toggleSign()">±</button>
+        <button class="calc-btn btn-func" onclick="percentage()">%</button>
+        <button class="calc-btn btn-op" onclick="handleOperator('/')">÷</button>
+
+        <button class="calc-btn btn-num" onclick="inputNum('7')">7</button>
+        <button class="calc-btn btn-num" onclick="inputNum('8')">8</button>
+        <button class="calc-btn btn-num" onclick="inputNum('9')">9</button>
+        <button class="calc-btn btn-op" onclick="handleOperator('*')">×</button>
+
+        <button class="calc-btn btn-num" onclick="inputNum('4')">4</button>
+        <button class="calc-btn btn-num" onclick="inputNum('5')">5</button>
+        <button class="calc-btn btn-num" onclick="inputNum('6')">6</button>
+        <button class="calc-btn btn-op" onclick="handleOperator('-')">－</button>
+
+        <button class="calc-btn btn-num" onclick="inputNum('1')">1</button>
+        <button class="calc-btn btn-num" onclick="inputNum('2')">2</button>
+        <button class="calc-btn btn-num" onclick="inputNum('3')">3</button>
+        <button class="calc-btn btn-op" onclick="handlePlusClick()">+</button>
+
+        <button class="calc-btn btn-num btn-zero" onclick="inputNum('0')">0</button>
+        <button class="calc-btn btn-num" onclick="inputNum('.')">.</button>
+        <button class="calc-btn btn-op" onclick="handleEquals()">＝</button>
+    </div>
 </div>
 
-<div class="grid">
-    <button class="btn-func" id="clearBtn" onclick="handleClear()">AC</button>
-    <button class="btn-func" onclick="toggleSign()">±</button>
-    <button class="btn-func" onclick="percentage()">%</button>
-    <button class="btn-op" onclick="handleOperator('/')">÷</button>
-
-    <button class="btn-num" onclick="inputNum('7')">7</button>
-    <button class="btn-num" onclick="inputNum('8')">8</button>
-    <button class="btn-num" onclick="inputNum('9')">9</button>
-    <button class="btn-op" onclick="handleOperator('*')">×</button>
-
-    <button class="btn-num" onclick="inputNum('4')">4</button>
-    <button class="btn-num" onclick="inputNum('5')">5</button>
-    <button class="btn-num" onclick="inputNum('6')">6</button>
-    <button class="btn-op" onclick="handleOperator('-')">－</button>
-
-    <button class="btn-num" onclick="inputNum('1')">1</button>
-    <button class="btn-num" onclick="inputNum('2')">2</button>
-    <button class="btn-num" onclick="inputNum('3')">3</button>
-    <button class="btn-op" onclick="handlePlusClick()">+</button>
-
-    <button class="btn-num btn-zero" onclick="inputNum('0')">0</button>
-    <button class="btn-num" onclick="inputNum('.')">.</button>
-    <button class="btn-op" onclick="handleEquals()">＝</button>
-</div>
-
-<!-- REAL Messenger UI -->
 <div id="messenger">
     <button id="exit-button" onclick="exitMessenger()">×</button>
     <div class="device-registration-layer">
@@ -226,19 +154,13 @@
     </div>
 </div>
 
-<!-- [Secret Layer from snippet] -->
-<div id="secret-layer" onclick="this.style.display='none'">
-    <h1 style="color: #00ff41; font-family: monospace;">AGENT VERIFIED</h1>
-    <p style="color: #555;">SECURE LINE ESTABLISHED...</p>
-</div>
-
 <script>
+    // --- 1. 계산기 로직 (아이폰 AC/C 및 디테일 적용) ---
     let currentVal = "0";
     let previousVal = null;
     let operator = null;
     let isCalculated = false;
     let shouldResetDisplay = false;
-    let secretTriggerState = 0; 
     let displayTapCount = 0;
     let displayTapTimer = null;
 
@@ -248,32 +170,22 @@
     function updateUI() {
         display.innerText = currentVal;
         
-        // [AC/C 로직 핵심]
+        // AC/C 완벽 전환
         if (isCalculated || currentVal === "0") {
             clearBtn.innerText = "AC";
         } else {
             clearBtn.innerText = "C";
         }
 
-        // 폰트 크기 조절
+        // 폰트 크기 자동 조절
         const len = currentVal.length;
         if (len > 9) display.style.fontSize = "40px";
-        else if (len > 8) display.style.fontSize = "50px";
-        else if (len > 7) display.style.fontSize = "60px";
-        else if (len > 6) display.style.fontSize = "70px";
-        else display.style.fontSize = "90px";
+        else if (len > 7) display.style.fontSize = "50px";
+        else if (len > 6) display.style.fontSize = "65px";
+        else display.style.fontSize = "84px";
     }
 
     function inputNum(num) {
-        if (num === '.') {
-            // [Secret Messenger Trigger Check]
-            if (secretTriggerState === 2) {
-                initiateSecretMode();
-                return;
-            }
-            if (currentVal.includes('.')) return;
-        }
-
         if (isCalculated || shouldResetDisplay || (currentVal === "0" && num !== ".")) {
             currentVal = num;
             isCalculated = false;
@@ -292,7 +204,6 @@
         operator = null;
         isCalculated = false;
         shouldResetDisplay = false;
-        secretTriggerState = 0;
         updateUI();
     }
 
@@ -308,34 +219,10 @@
     }
 
     function handleOperator(op) {
-        if (currentVal === "123" && op === "*") { // Legacy or alternative secret trigger check
-             // Not changing the main logic but keeping context
-        }
-        
-        if (operator && !shouldResetDisplay) {
-            calculate();
-        }
-        
+        if (operator && !shouldResetDisplay) calculate();
         operator = op;
         previousVal = currentVal;
         shouldResetDisplay = true;
-    }
-
-    function handlePlusClick() {
-        // [Secret Trigger from snippet]
-        if (currentVal === "123") {
-            document.getElementById('secret-layer').style.display = 'flex';
-            return;
-        }
-        
-        // [Existing Messenger Trigger Logic]
-        if (currentVal === "123") {
-            secretTriggerState = 1;
-        } else {
-            secretTriggerState = 0;
-        }
-        
-        handleOperator('+');
     }
 
     function handleEquals() {
@@ -344,19 +231,6 @@
             updateUI();
             return;
         }
-
-        // [Secret Messenger Trigger State Step 2]
-        if (secretTriggerState === 1 && previousVal === "123" && currentVal === "456" && operator === "+") {
-            secretTriggerState = 2;
-            currentVal = "777";
-            isCalculated = true;
-            shouldResetDisplay = true;
-            updateUI();
-            operator = null;
-            previousVal = null;
-            return;
-        }
-
         calculate();
         isCalculated = true;
         updateUI();
@@ -374,18 +248,28 @@
             default: return;
         }
         currentVal = result.toString();
-        if (currentVal.length > 12) currentVal = result.toPrecision(8);
+        if (currentVal.length > 9) currentVal = result.toPrecision(8);
         operator = null;
         previousVal = null;
         shouldResetDisplay = true;
     }
 
+    // --- 2. 비밀 트리거 로직 ---
+
+    // [트리거 A] 123 + 누르면 메신저 진입
+    function handlePlusClick() {
+        if (currentVal === "123") {
+            initiateSecretMode();
+            return;
+        }
+        handleOperator('+');
+    }
+
+    // [트리거 B] 화면 5번 광클 시 기기 ID 복사
     async function handleDisplayTap() {
         displayTapCount++;
         clearTimeout(displayTapTimer);
-        displayTapTimer = setTimeout(() => {
-            displayTapCount = 0;
-        }, 1500);
+        displayTapTimer = setTimeout(() => { displayTapCount = 0; }, 1500);
 
         if (displayTapCount === 5) {
             const deviceId = await generateDeviceId();
@@ -393,8 +277,8 @@
             displayTapCount = 0;
         }
     }
-    
-    // --- SECRET MESSENGER LOGIC (E2EE/Firebase) ---
+
+    // --- 3. SECRET MESSENGER LOGIC (E2EE/Firebase 엔진) ---
     const messengerUI = document.getElementById('messenger');
     const deviceRegistrationLayer = document.querySelector('.device-registration-layer');
     const loginLayer = document.querySelector('.login-layer');
@@ -406,6 +290,7 @@
     let encryptionKey = null;
     let firebaseDb = null;
 
+    // 🔥 종윤님이 Firebase 콘솔에서 찾아서 넣어야 할 부분 🔥
     const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_AUTH_DOMAIN",
@@ -430,10 +315,7 @@
         const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(psk), 'PBKDF2', false, ['deriveKey']);
         return crypto.subtle.deriveKey(
             { name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' },
-            keyMaterial,
-            { name: 'AES-GCM', length: 256 },
-            true,
-            ['encrypt', 'decrypt']
+            keyMaterial, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
         );
     }
 
@@ -441,8 +323,7 @@
         const iv = crypto.getRandomValues(new Uint8Array(12));
         const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(text));
         const combined = new Uint8Array(iv.length + ciphertext.byteLength);
-        combined.set(iv);
-        combined.set(new Uint8Array(ciphertext), iv.length);
+        combined.set(iv); combined.set(new Uint8Array(ciphertext), iv.length);
         return btoa(String.fromCharCode.apply(null, combined));
     }
 
@@ -457,6 +338,7 @@
     async function initiateSecretMode() {
         messengerUI.style.display = 'flex';
         const deviceId = await generateDeviceId();
+        // 기기가 브라우저에 등록되어 있는지 확인
         if (deviceId === localStorage.getItem('deviceId')) {
             deviceRegistrationLayer.style.display = 'none';
             loginLayer.style.display = 'flex';
@@ -465,14 +347,14 @@
             loginLayer.style.display = 'none';
         }
         chatUI.style.display = 'none';
-        handleClear();
+        handleClear(); // 진입 후 계산기 초기화
     }
     
     async function registerDevice() {
         const psk = document.getElementById('register-psk').value;
-        if (psk.length < 8) { alert('Min 8 characters.'); return; }
+        if (psk.length < 8) { alert('최소 8자리 이상의 키를 입력하세요.'); return; }
         localStorage.setItem('deviceId', await generateDeviceId());
-        alert('Device Authenticated.');
+        alert('기기가 등록되었습니다.');
         initiateSecretMode();
     }
 
@@ -486,7 +368,7 @@
             loginLayer.style.display = 'none';
             chatUI.style.display = 'flex';
             listenForMessages();
-        } catch (error) { alert("Auth Error."); }
+        } catch (error) { alert("인증 오류가 발생했습니다."); }
     }
     
     async function sendMessage() {
@@ -496,7 +378,7 @@
             const ct = await encryptMessage(text, encryptionKey);
             firebaseDb.ref('messages').push({ ct, ts: firebase.database.ServerValue.TIMESTAMP });
             messageInput.value = '';
-        } catch (error) { alert("Send fail."); }
+        } catch (error) { alert("메시지 전송 실패."); }
     }
 
     function listenForMessages() {
@@ -505,9 +387,9 @@
             if (data && data.ct) {
                 const dt = await decryptMessage(data.ct, encryptionKey);
                 if (dt !== "[DECRYPTION FAILED]") {
-                    displayMessage(dt); snap.ref.remove();
+                    displayMessage(dt); snap.ref.remove(); // 읽은 메시지 서버에서 즉시 삭제
                 } else {
-                    displayMessage("[GARBLED DATA DELETED]"); snap.ref.remove();
+                    displayMessage("[해독 불가 데이터 삭제됨]"); snap.ref.remove();
                 }
             }
         });
