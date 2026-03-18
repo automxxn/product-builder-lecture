@@ -41,13 +41,15 @@
             width: 100%; 
             max-width: 400px; 
             padding: 0 20px 30px 20px;
+            display: flex;
+            flex-direction: column;
         }
 
         .display-container { 
             text-align: right; 
-            padding: 0 30px 10px 30px; 
+            padding: 0 20px 10px 20px; 
             cursor: pointer; 
-            min-height: 120px;
+            min-height: 140px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
@@ -55,9 +57,9 @@
         
         #display {
             color: var(--ios-white); 
-            font-size: 70px; /* Reduced slightly to fit expression */
+            font-size: 64px; 
             font-weight: 200;
-            letter-spacing: -2px; 
+            letter-spacing: -1px; 
             white-space: nowrap; 
             overflow: hidden;
             transition: font-size 0.1s ease;
@@ -72,7 +74,6 @@
 
         button.calc-btn {
             width: 100%;
-            min-width: 0; 
             aspect-ratio: 1 / 1; 
             border: none; 
             border-radius: 50%;
@@ -93,48 +94,23 @@
         .btn-num { background-color: var(--ios-dark-gray); color: var(--ios-white); }
         .btn-num:active { background-color: #737373; }
 
-        .btn-func { background-color: var(--ios-light-gray); color: var(--ios-black); font-size: 28px; }
+        .btn-func { background-color: var(--ios-light-gray); color: var(--ios-black); font-size: 26px; }
         .btn-func:active { background-color: #D4D4D2; }
 
         .btn-op { background-color: var(--ios-orange); color: var(--ios-white); font-size: 38px; }
         .btn-op:active { background-color: #FFFFFF; color: var(--ios-orange); }
-        .btn-op.active { background-color: #FFFFFF; color: var(--ios-orange); }
 
-        .btn-empty { background-color: transparent; cursor: default; pointer-events: none; }
-
-        /* Secret Messenger UI */
-        #messenger {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #000; z-index: 1000; display: none;
-            flex-direction: column; padding: 60px 20px 20px 20px;
-            color: #00ff41; font-family: 'SF Mono', 'Courier New', monospace;
-        }
+        /* Messenger UI */
+        #messenger { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 1000; display: none; flex-direction: column; padding: 60px 20px 20px 20px; color: #00ff41; font-family: 'SF Mono', 'Courier New', monospace; }
         #messenger h2 { text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
-        .login-layer, .device-registration-layer {
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            height: 60%; gap: 25px;
-        }
-        .messenger-input {
-            width: 100%; max-width: 320px; padding: 15px; background-color: #111;
-            border: 1px solid #00ff41; color: #00ff41; font-size: 18px;
-            text-align: center; border-radius: 8px; outline: none;
-        }
-        .messenger-button {
-            width: 100%; max-width: 320px; padding: 15px; background-color: #00ff41;
-            color: #000; border: none; cursor: pointer; font-size: 18px;
-            font-weight: bold; border-radius: 8px;
-        }
+        .login-layer, .device-registration-layer { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 60%; gap: 25px; }
+        .messenger-input { width: 100%; max-width: 320px; padding: 15px; background-color: #111; border: 1px solid #00ff41; color: #00ff41; font-size: 18px; text-align: center; border-radius: 8px; outline: none; }
+        .messenger-button { width: 100%; max-width: 320px; padding: 15px; background-color: #00ff41; color: #000; border: none; cursor: pointer; font-size: 18px; font-weight: bold; border-radius: 8px; }
         #chat-ui { display: none; flex-direction: column; height: 100%; }
-        #message-display {
-            flex-grow: 1; overflow-y: auto; border: 1px solid #00ff41;
-            padding: 15px; margin-bottom: 15px; list-style: none; border-radius: 8px;
-        }
+        #message-display { flex-grow: 1; overflow-y: auto; border: 1px solid #00ff41; padding: 15px; margin-bottom: 15px; list-style: none; border-radius: 8px; }
         #message-display li { margin-bottom: 10px; line-height: 1.4; word-break: break-all; }
         #message-form { display: flex; gap: 10px; }
-        #exit-button {
-            position: absolute; top: 40px; right: 25px; background: none; border: none;
-            color: #00ff41; font-size: 35px; cursor: pointer;
-        }
+        #exit-button { position: absolute; top: 40px; right: 25px; background: none; border: none; color: #00ff41; font-size: 35px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -145,32 +121,32 @@
     </div>
 
     <div class="grid">
-        <!-- Row 1: Empty, AC, %, ÷ -->
-        <button class="calc-btn btn-empty"></button>
+        <!-- Row 1: Backspace, AC, %, ÷ -->
+        <button class="calc-btn btn-func" onclick="handleBackspace()">⌫</button>
         <button class="calc-btn btn-func" id="clearBtn" onclick="handleClear()">AC</button>
         <button class="calc-btn btn-func" onclick="handlePercentage()">%</button>
-        <button class="calc-btn btn-op" id="op-divide" onclick="handleOperator('/')">÷</button>
+        <button class="calc-btn btn-op" onclick="handleOperator('/')">÷</button>
 
         <!-- Row 2: 7, 8, 9, × -->
         <button class="calc-btn btn-num" onclick="inputNum('7')">7</button>
         <button class="calc-btn btn-num" onclick="inputNum('8')">8</button>
         <button class="calc-btn btn-num" onclick="inputNum('9')">9</button>
-        <button class="calc-btn btn-op" id="op-multiply" onclick="handleOperator('*')">×</button>
+        <button class="calc-btn btn-op" onclick="handleOperator('*')">×</button>
 
         <!-- Row 3: 4, 5, 6, - -->
         <button class="calc-btn btn-num" onclick="inputNum('4')">4</button>
         <button class="calc-btn btn-num" onclick="inputNum('5')">5</button>
         <button class="calc-btn btn-num" onclick="inputNum('6')">6</button>
-        <button class="calc-btn btn-op" id="op-subtract" onclick="handleOperator('-')">－</button>
+        <button class="calc-btn btn-op" onclick="handleOperator('-')">－</button>
 
         <!-- Row 4: 1, 2, 3, + -->
         <button class="calc-btn btn-num" onclick="inputNum('1')">1</button>
         <button class="calc-btn btn-num" onclick="inputNum('2')">2</button>
         <button class="calc-btn btn-num" onclick="inputNum('3')">3</button>
-        <button class="calc-btn btn-op" id="op-add" onclick="handleOperator('+')">+</button>
+        <button class="calc-btn btn-op" onclick="handlePlusClick()">+</button>
 
         <!-- Row 5: ±, 0, ., = -->
-        <button class="calc-btn btn-num" onclick="toggleSign()">±</button>
+        <button class="calc-btn btn-num" onclick="toggleSign()">+/-</button>
         <button class="calc-btn btn-num" onclick="inputNum('0')">0</button>
         <button class="calc-btn btn-num" onclick="inputNum('.')">.</button>
         <button class="calc-btn btn-op" onclick="handleEquals()">＝</button>
@@ -212,14 +188,8 @@
     const clearBtn = document.getElementById('clearBtn');
 
     function updateUI() {
-        // Show the expression if it exists, otherwise just the current value
-        if (fullExpression === "") {
-            display.innerText = currentVal;
-        } else {
-            // Replace internal operators with display symbols
-            let displayExpr = fullExpression.replace(/\*/g, '×').replace(/\//g, '÷').replace(/-/g, '－');
-            display.innerText = displayExpr + (lastInputIsOperator ? "" : currentVal);
-        }
+        let displayStr = fullExpression === "" ? currentVal : fullExpression.replace(/\*/g, '×').replace(/\//g, '÷').replace(/-/g, '－') + (lastInputIsOperator ? "" : currentVal);
+        display.innerText = displayStr;
         
         if (currentVal === "0" && fullExpression === "") {
             clearBtn.innerText = "AC";
@@ -228,91 +198,63 @@
         }
 
         // Dynamic font size
-        const len = display.innerText.length;
-        if (len > 12) display.style.fontSize = "35px";
-        else if (len > 9) display.style.fontSize = "45px";
-        else if (len > 7) display.style.fontSize = "55px";
-        else display.style.fontSize = "70px";
+        const len = displayStr.length;
+        if (len > 15) display.style.fontSize = "30px";
+        else if (len > 12) display.style.fontSize = "40px";
+        else if (len > 9) display.style.fontSize = "50px";
+        else display.style.fontSize = "64px";
     }
 
     function inputNum(num) {
         if (num === '.') {
-            // Special trigger check
-            if (fullExpression === "123+456" && currentVal === "777") {
-                initiateSecretMode();
-                return;
-            }
+            if (fullExpression === "123 + 456" && currentVal === "777") { initiateSecretMode(); return; }
             if (currentVal.includes('.')) return;
         }
-
-        if (isCalculated) {
-            currentVal = num;
-            fullExpression = "";
-            isCalculated = false;
-        } else if (currentVal === "0" && num !== ".") {
-            currentVal = num;
-        } else {
-            if (currentVal.length < 9) currentVal += num;
-        }
+        if (isCalculated) { currentVal = num; fullExpression = ""; isCalculated = false; }
+        else if (currentVal === "0" && num !== ".") { currentVal = num; }
+        else { if (currentVal.length < 9) currentVal += num; }
         lastInputIsOperator = false;
         updateUI();
     }
 
     function handleOperator(op) {
-        // [Secret Trigger Check]
-        if (currentVal === "123" && op === "+") {
-            // Highlight + but we also allow user to see it
-        }
-
-        if (isCalculated) {
-            fullExpression = currentVal + " " + op + " ";
-            isCalculated = false;
-        } else if (lastInputIsOperator) {
-            // Change operator if pressed consecutively
-            fullExpression = fullExpression.slice(0, -3) + " " + op + " ";
-        } else {
-            fullExpression += currentVal + " " + op + " ";
-        }
-        
+        if (isCalculated) { fullExpression = currentVal + " " + op + " "; isCalculated = false; }
+        else if (lastInputIsOperator) { fullExpression = fullExpression.slice(0, -3) + " " + op + " "; }
+        else { fullExpression += currentVal + " " + op + " "; }
         currentVal = "0";
         lastInputIsOperator = true;
         updateUI();
     }
 
+    function handlePlusClick() {
+        if (currentVal === "123") { /* Secret Check Step 1 */ }
+        handleOperator('+');
+    }
+
     function handleEquals() {
         if (fullExpression === "") return;
-        
-        // Final secret check logic
-        if (fullExpression === "123 + " && currentVal === "456") {
-            currentVal = "777";
-            fullExpression = "123 + 456";
-            isCalculated = true;
-            updateUI();
-            return;
-        }
-
+        if (fullExpression === "123 + " && currentVal === "456") { currentVal = "777"; fullExpression = "123 + 456"; isCalculated = true; updateUI(); return; }
         try {
-            let exprToEval = fullExpression + currentVal;
-            // Basic eval replacement
-            let result = eval(exprToEval.replace(/－/g, '-')); 
-            
+            let expr = (fullExpression + currentVal).replace(/－/g, '-');
+            let result = eval(expr);
             fullExpression = "";
             currentVal = result.toString();
             if (currentVal.length > 10) currentVal = result.toPrecision(8);
             isCalculated = true;
             lastInputIsOperator = false;
             updateUI();
-        } catch (e) {
-            handleClear();
-            display.innerText = "Error";
-        }
+        } catch (e) { handleClear(); }
     }
 
     function handleClear() {
-        currentVal = "0";
-        fullExpression = "";
-        isCalculated = false;
-        lastInputIsOperator = false;
+        currentVal = "0"; fullExpression = ""; isCalculated = false; lastInputIsOperator = false;
+        updateUI();
+    }
+
+    function handleBackspace() {
+        if (isCalculated) { handleClear(); return; }
+        if (currentVal.length > 1) { currentVal = currentVal.slice(0, -1); }
+        else { currentVal = "0"; }
         updateUI();
     }
 
@@ -328,148 +270,27 @@
     }
 
     async function handleDisplayTap() {
-        displayTapCount++;
-        clearTimeout(displayTapTimer);
+        displayTapCount++; clearTimeout(displayTapTimer);
         displayTapTimer = setTimeout(() => { displayTapCount = 0; }, 1500);
-        if (displayTapCount === 5) {
-            const deviceId = await generateDeviceId();
-            alert("Device ID: " + deviceId);
-            displayTapCount = 0;
-        }
+        if (displayTapCount === 5) { const deviceId = await generateDeviceId(); alert("Device ID: " + deviceId); displayTapCount = 0; }
     }
 
-    // --- SECRET MESSENGER LOGIC (E2EE/Firebase) ---
+    // --- SECRET MESSENGER LOGIC ---
     const messengerUI = document.getElementById('messenger');
-    const deviceRegistrationLayer = document.querySelector('.device-registration-layer');
-    const loginLayer = document.querySelector('.login-layer');
-    const chatUI = document.getElementById('chat-ui');
-    const messageForm = document.getElementById('message-form');
-    const messageInput = document.getElementById('message-input');
-    const messageDisplay = document.getElementById('message-display');
-
-    let encryptionKey = null;
-    let firebaseDb = null;
-
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        databaseURL: "YOUR_DATABASE_URL",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
-    
-    async function generateDeviceId() {
-        const { userAgent, language, hardwareConcurrency, deviceMemory } = navigator;
-        const screen = window.screen;
-        const fingerprint = `${userAgent}${language}${hardwareConcurrency}${deviceMemory}${screen.width}${screen.height}${screen.colorDepth}`;
-        const encoder = new TextEncoder();
-        const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(fingerprint));
-        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    async function deriveKeyFromPSK(psk, salt) {
-        const enc = new TextEncoder();
-        const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(psk), 'PBKDF2', false, ['deriveKey']);
-        return crypto.subtle.deriveKey(
-            { name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' },
-            keyMaterial, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
-        );
-    }
-
-    async function encryptMessage(text, key) {
-        const iv = crypto.getRandomValues(new Uint8Array(12));
-        const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(text));
-        const combined = new Uint8Array(iv.length + ciphertext.byteLength);
-        combined.set(iv); combined.set(new Uint8Array(ciphertext), iv.length);
-        return btoa(String.fromCharCode.apply(null, combined));
-    }
-
-    async function decryptMessage(b64, key) {
-        try {
-            const combined = new Uint8Array(atob(b64).split('').map(c => c.charCodeAt(0)));
-            const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: combined.slice(0, 12) }, key, combined.slice(12));
-            return new TextDecoder().decode(decrypted);
-        } catch (e) { return "[DECRYPTION FAILED]"; }
-    }
-    
-    async function initiateSecretMode() {
-        messengerUI.style.display = 'flex';
-        const deviceId = await generateDeviceId();
-        if (deviceId === localStorage.getItem('deviceId')) {
-            deviceRegistrationLayer.style.display = 'none';
-            loginLayer.style.display = 'flex';
-        } else {
-            deviceRegistrationLayer.style.display = 'flex';
-            loginLayer.style.display = 'none';
-        }
-        chatUI.style.display = 'none';
-        handleClear();
-    }
-    
-    async function registerDevice() {
-        const psk = document.getElementById('register-psk').value;
-        if (psk.length < 8) { alert('최소 8자리 이상의 키를 입력하세요.'); return; }
-        localStorage.setItem('deviceId', await generateDeviceId());
-        alert('기기가 등록되었습니다.');
-        initiateSecretMode();
-    }
-
-    async function login() {
-        const psk = document.getElementById('login-psk').value;
-        if (!psk) return;
-        try {
-            encryptionKey = await deriveKeyFromPSK(psk, await generateDeviceId());
-            if (firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
-            firebaseDb = firebase.database();
-            loginLayer.style.display = 'none';
-            chatUI.style.display = 'flex';
-            listenForMessages();
-        } catch (error) { alert("인증 오류."); }
-    }
-    
-    async function sendMessage() {
-        const text = messageInput.value;
-        if (text.trim() === '' || !encryptionKey || !firebaseDb) return;
-        try {
-            const ct = await encryptMessage(text, encryptionKey);
-            firebaseDb.ref('messages').push({ ct, ts: firebase.database.ServerValue.TIMESTAMP });
-            messageInput.value = '';
-        } catch (error) { alert("전송 실패."); }
-    }
-
-    function listenForMessages() {
-        firebaseDb.ref('messages').on('child_added', async (snap) => {
-            const data = snap.val();
-            if (data && data.ct) {
-                const dt = await decryptMessage(data.ct, encryptionKey);
-                if (dt !== "[DECRYPTION FAILED]") {
-                    displayMessage(dt); snap.ref.remove();
-                } else {
-                    displayMessage("[해독 불가 삭제]"); snap.ref.remove();
-                }
-            }
-        });
-    }
-    
-    function displayMessage(text) {
-        const li = document.createElement('li');
-        li.textContent = "> " + text;
-        messageDisplay.appendChild(li);
-        messageDisplay.scrollTop = messageDisplay.scrollHeight;
-    }
-    
-    function exitMessenger() {
-        if (firebaseDb) firebaseDb.ref('messages').off();
-        encryptionKey = null; firebaseDb = null;
-        document.getElementById('login-psk').value = '';
-        document.getElementById('register-psk').value = '';
-        messageInput.value = ''; messageDisplay.innerHTML = '';
-        messengerUI.style.display = 'none';
-    }
-
-    messageForm.addEventListener('submit', sendMessage);
+    const firebaseConfig = { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", databaseURL: "YOUR_DATABASE_URL", projectId: "YOUR_PROJECT_ID", storageBucket: "YOUR_STORAGE_BUCKET", messagingSenderId: "YOUR_MESSAGING_SENDER_ID", appId: "YOUR_APP_ID" };
+    async function generateDeviceId() { const { userAgent, language, hardwareConcurrency, deviceMemory } = navigator; const screen = window.screen; const fingerprint = `${userAgent}${language}${hardwareConcurrency}${deviceMemory}${screen.width}${screen.height}${screen.colorDepth}`; const encoder = new TextEncoder(); const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(fingerprint)); return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+    async function deriveKeyFromPSK(psk, salt) { const enc = new TextEncoder(); const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(psk), 'PBKDF2', false, ['deriveKey']); return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']); }
+    async function encryptMessage(text, key) { const iv = crypto.getRandomValues(new Uint8Array(12)); const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(text)); const combined = new Uint8Array(iv.length + ciphertext.byteLength); combined.set(iv); combined.set(new Uint8Array(ciphertext), iv.length); return btoa(String.fromCharCode.apply(null, combined)); }
+    async function decryptMessage(b64, key) { try { const combined = new Uint8Array(atob(b64).split('').map(c => c.charCodeAt(0))); const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: combined.slice(0, 12) }, key, combined.slice(12)); return new TextDecoder().decode(decrypted); } catch (e) { return "[DECRYPTION FAILED]"; } }
+    async function initiateSecretMode() { messengerUI.style.display = 'flex'; const deviceId = await generateDeviceId(); if (deviceId === localStorage.getItem('deviceId')) { document.querySelector('.device-registration-layer').style.display = 'none'; document.querySelector('.login-layer').style.display = 'flex'; } else { document.querySelector('.device-registration-layer').style.display = 'flex'; document.querySelector('.login-layer').style.display = 'none'; } document.getElementById('chat-ui').style.display = 'none'; handleClear(); }
+    async function registerDevice() { const psk = document.getElementById('register-psk').value; if (psk.length < 8) { alert('최소 8자리 이상의 키를 입력하세요.'); return; } localStorage.setItem('deviceId', await generateDeviceId()); alert('기기가 등록되었습니다.'); initiateSecretMode(); }
+    async function login() { const psk = document.getElementById('login-psk').value; if (!psk) return; try { const deviceId = await generateDeviceId(); const encryptionKeyMaterial = await deriveKeyFromPSK(psk, deviceId); encryptionKey = encryptionKeyMaterial; if (firebase.apps.length === 0) firebase.initializeApp(firebaseConfig); firebaseDb = firebase.database(); document.querySelector('.login-layer').style.display = 'none'; document.getElementById('chat-ui').style.display = 'flex'; listenForMessages(); } catch (error) { alert("인증 오류."); } }
+    async function sendMessage() { const text = document.getElementById('message-input').value; if (text.trim() === '' || !encryptionKey || !firebaseDb) return; try { const ct = await encryptMessage(text, encryptionKey); firebaseDb.ref('messages').push({ ct, ts: firebase.database.ServerValue.TIMESTAMP }); document.getElementById('message-input').value = ''; } catch (error) { alert("전송 실패."); } }
+    function listenForMessages() { firebaseDb.ref('messages').on('child_added', async (snap) => { const data = snap.val(); if (data && data.ct) { const dt = await decryptMessage(data.ct, encryptionKey); if (dt !== "[DECRYPTION FAILED]") { displayMessage(dt); snap.ref.remove(); } else { displayMessage("[해독 불가 삭제]"); snap.ref.remove(); } } }); }
+    function displayMessage(text) { const li = document.createElement('li'); li.textContent = "> " + text; document.getElementById('message-display').appendChild(li); document.getElementById('message-display').scrollTop = document.getElementById('message-display').scrollHeight; }
+    function exitMessenger() { if (firebaseDb) firebaseDb.ref('messages').off(); encryptionKey = null; firebaseDb = null; document.getElementById('login-psk').value = ''; document.getElementById('register-psk').value = ''; document.getElementById('message-input').value = ''; document.getElementById('message-display').innerHTML = ''; messengerUI.style.display = 'none'; }
+    document.getElementById('message-form').addEventListener('submit', sendMessage);
+    updateUI();
 </script>
 </body>
 </html>
