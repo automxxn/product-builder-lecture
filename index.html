@@ -49,20 +49,22 @@
         }
 
         button.calc-btn {
-            width: 100%; /* 버튼 크기 제멋대로 변하는 버그 완벽 차단 */
+            width: 100%;
             aspect-ratio: 1 / 1; 
             border: none; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: filter 0.1s, transform 0.1s;
             outline: none;
             padding: 0;
+            font-size: 32px; /* Standardize font size */
+            font-weight: 400;
         }
 
         button.calc-btn:active { filter: brightness(1.6); transform: scale(0.95); }
 
-        .btn-num { background-color: var(--btn-dark); color: white; font-size: 36px; font-weight: 400; }
-        .btn-func { background-color: var(--btn-gray); color: black; font-size: 30px; font-weight: 400; }
-        .btn-op { background-color: var(--btn-orange); color: white; font-size: 40px; font-weight: 400; }
+        .btn-num { background-color: var(--btn-dark); color: white; }
+        .btn-func { background-color: var(--btn-gray); color: black; font-size: 28px; }
+        .btn-op { background-color: var(--btn-orange); color: white; font-size: 36px; }
         
         /* 0 버튼 특별 처리 */
         .btn-zero {
