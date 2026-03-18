@@ -40,7 +40,7 @@
         .calc-container {
             width: 100%; 
             max-width: 400px; 
-            padding: 0 20px 20px 20px;
+            padding: 0 20px 30px 20px;
         }
 
         .display-container { 
@@ -52,7 +52,7 @@
         #display {
             color: var(--ios-white); 
             font-size: 94px; 
-            font-weight: 200;
+            font-weight: 200; /* Extra thin iOS style */
             letter-spacing: -2px; 
             white-space: nowrap; 
             overflow: hidden;
@@ -68,6 +68,7 @@
 
         button.calc-btn {
             width: 100%;
+            min-width: 0; /* Prevents text from expanding button */
             aspect-ratio: 1 / 1; 
             border: none; 
             border-radius: 50%;
@@ -80,23 +81,24 @@
             font-family: inherit;
             font-size: 36px;
             font-weight: 400;
-            transition: filter 0.1s;
+            transition: background-color 0.1s;
+            overflow: hidden;
         }
 
-        /* iOS Official Colors */
+        /* iOS Official Colors & Active States */
         .btn-num { background-color: var(--ios-dark-gray); color: var(--ios-white); }
-        .btn-func { background-color: var(--ios-light-gray); color: var(--ios-black); font-size: 32px; }
-        .btn-op { background-color: var(--ios-orange); color: var(--ios-white); font-size: 42px; }
+        .btn-num:active { background-color: #737373; }
 
-        /* Pressed States */
-        .btn-num:active { filter: brightness(1.8); }
-        .btn-func:active { filter: brightness(1.2); }
-        .btn-op:active { filter: brightness(1.4); }
+        .btn-func { background-color: var(--ios-light-gray); color: var(--ios-black); font-size: 32px; }
+        .btn-func:active { background-color: #D4D4D2; }
+
+        .btn-op { background-color: var(--ios-orange); color: var(--ios-white); font-size: 42px; }
+        .btn-op:active { background-color: #FBC08E; }
 
         /* 0 버튼: 정교한 캡슐 형태 */
         .btn-zero {
             grid-column: span 2; 
-            aspect-ratio: auto; 
+            aspect-ratio: auto !important; 
             border-radius: 100px;
             justify-content: flex-start; 
             padding-left: 35px; 
@@ -223,7 +225,7 @@
         if (len > 9) display.style.fontSize = "40px";
         else if (len > 7) display.style.fontSize = "50px";
         else if (len > 6) display.style.fontSize = "65px";
-        else display.style.fontSize = "94px";
+        else display.style.fontSize = "84px";
     }
 
     function inputNum(num) {
@@ -331,7 +333,7 @@
     let encryptionKey = null;
     let firebaseDb = null;
 
-    // 🔥 종윤님이 Firebase 콘솔에서 찾아서 넣어야 할 부분 🔥
+    // 🔥 Firebase Config 🔥
     const firebaseConfig = {
         apiKey: "YOUR_API_KEY",
         authDomain: "YOUR_AUTH_DOMAIN",
@@ -379,7 +381,6 @@
     async function initiateSecretMode() {
         messengerUI.style.display = 'flex';
         const deviceId = await generateDeviceId();
-        // 기기가 브라우저에 등록되어 있는지 확인
         if (deviceId === localStorage.getItem('deviceId')) {
             deviceRegistrationLayer.style.display = 'none';
             loginLayer.style.display = 'flex';
@@ -388,7 +389,7 @@
             loginLayer.style.display = 'none';
         }
         chatUI.style.display = 'none';
-        handleClear(); // 진입 후 계산기 초기화
+        handleClear();
     }
     
     async function registerDevice() {
@@ -428,7 +429,7 @@
             if (data && data.ct) {
                 const dt = await decryptMessage(data.ct, encryptionKey);
                 if (dt !== "[DECRYPTION FAILED]") {
-                    displayMessage(dt); snap.ref.remove(); // 읽은 메시지 서버에서 즉시 삭제
+                    displayMessage(dt); snap.ref.remove();
                 } else {
                     displayMessage("[해독 불가 데이터 삭제됨]"); snap.ref.remove();
                 }
