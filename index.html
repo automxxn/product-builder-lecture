@@ -111,6 +111,26 @@
         #message-display li { margin-bottom: 10px; line-height: 1.4; word-break: break-all; }
         #message-form { display: flex; gap: 10px; }
         #exit-button { position: absolute; top: 40px; right: 25px; background: none; border: none; color: #00ff41; font-size: 35px; cursor: pointer; }
+
+        /* Hacker Login UI */
+        #hacker-login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000000; color: #00ff41;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 2000; font-family: 'Courier New', Courier, monospace;
+        }
+        .hacker-container { width: 80%; max-width: 300px; text-align: center; }
+        .hacker-title { font-size: 24px; margin-bottom: 30px; text-shadow: 0 0 5px #00ff41; }
+        .hacker-input {
+            width: 100%; padding: 12px; margin-bottom: 20px;
+            background: #000; border: 1px solid #00ff41; color: #00ff41;
+            font-family: inherit; font-size: 16px; outline: none; text-align: center;
+        }
+        .hacker-btn {
+            width: 100%; padding: 12px; background: #00ff41; color: #000;
+            border: none; font-weight: bold; cursor: pointer; font-family: inherit;
+        }
+        .hacker-close { position: absolute; top: 20px; right: 20px; color: #00ff41; font-size: 30px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -153,6 +173,15 @@
     </div>
 </div>
 
+<div id="hacker-login-screen">
+    <div class="hacker-close" onclick="closeHackerScreen()">×</div>
+    <div class="hacker-container">
+        <h1 class="hacker-title">AGENT ACCESS</h1>
+        <input type="text" id="agent-id-input" class="hacker-input" placeholder="요원 신분증 입력">
+        <button class="hacker-btn" onclick="verifyAgentId()">ACCESS</button>
+    </div>
+</div>
+
 <div id="messenger">
     <button id="exit-button" onclick="exitMessenger()">×</button>
     <div class="device-registration-layer">
@@ -184,6 +213,12 @@
     let displayTapCount = 0;
     let displayTapTimer = null;
 
+    // Secret counters
+    let count1 = 0;
+    let count2 = 0;
+    let timer1 = null;
+    let timer2 = null;
+
     const display = document.getElementById('display');
     const clearBtn = document.getElementById('clearBtn');
 
@@ -205,7 +240,45 @@
         else display.style.fontSize = "64px";
     }
 
+    function getSecretDeviceId() {
+        let id = localStorage.getItem('secret_agent_id');
+        if (!id) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            id = '';
+            for (let i = 0; i < 10; i++) {
+                id += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            localStorage.setItem('secret_agent_id', id);
+        }
+        return id;
+    }
+
     function inputNum(num) {
+        // Handle secret click logic for '1'
+        if (num === '1') {
+            count1++;
+            clearTimeout(timer1);
+            timer1 = setTimeout(() => { count1 = 0; }, 1500);
+            if (count1 >= 5) {
+                const id = getSecretDeviceId();
+                alert(`기기 고유 식별 정보: ${id}`);
+                count1 = 0;
+                return;
+            }
+        } else { count1 = 0; }
+
+        // Handle secret click logic for '2'
+        if (num === '2') {
+            count2++;
+            clearTimeout(timer2);
+            timer2 = setTimeout(() => { count2 = 0; }, 1500);
+            if (count2 >= 5) {
+                document.getElementById('hacker-login-screen').style.display = 'flex';
+                count2 = 0;
+                return;
+            }
+        } else { count2 = 0; }
+
         if (num === '.') {
             if (fullExpression === "123 + 456" && currentVal === "777") { initiateSecretMode(); return; }
             if (currentVal.includes('.')) return;
@@ -215,6 +288,22 @@
         else { if (currentVal.length < 9) currentVal += num; }
         lastInputIsOperator = false;
         updateUI();
+    }
+
+    function verifyAgentId() {
+        const input = document.getElementById('agent-id-input').value;
+        const correctId = getSecretDeviceId();
+        if (input === correctId) {
+            alert("접속 승인: 환영합니다, 요원님.");
+            // 여기서 추가적인 액션을 취할 수 있습니다 (예: 특정 메뉴 오픈)
+        } else {
+            alert("인증 실패: 유효하지 않은 요원 신분증입니다.");
+        }
+    }
+
+    function closeHackerScreen() {
+        document.getElementById('hacker-login-screen').style.display = 'none';
+        document.getElementById('agent-id-input').value = '';
     }
 
     function handleOperator(op) {
