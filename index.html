@@ -10,17 +10,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
         :root {
-            --bg-color: #000000;
-            --text-color: #ffffff;
-            --btn-num-bg: #333333;
-            --btn-num-text: #ffffff;
-            --btn-op-bg: #FF9F0A;
-            --btn-op-text: #ffffff;
-            --btn-misc-bg: #A5A5A5;
-            --btn-misc-text: #000000;
+            --bg-black: #000000;
+            --btn-dark: #333333;
+            --btn-orange: #FF9F0A;
+            --btn-light: #A5A5A5;
             --safe-area-top: env(safe-area-inset-top);
             --safe-area-bottom: env(safe-area-inset-bottom);
         }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -30,74 +27,81 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
+
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            height: 100vh;
+            background-color: var(--bg-black);
+            margin: 0;
             display: flex;
             justify-content: center;
-            align-items: flex-end;
-            padding: var(--safe-area-top) 0 var(--safe-area-bottom) 0;
+            align-items: flex-end; /* 아래쪽부터 배치 */
+            height: 100vh;
             overflow: hidden;
+            /* 아이폰 하단 홈 바 공간 확보 */
+            padding-bottom: calc(20px + var(--safe-area-bottom));
         }
-        .container {
+
+        .calc-container {
             width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            height: 100%;
+            max-width: 390px; /* 아이폰 15/16 표준 너비 */
+            padding: 0 16px;
         }
-        #calculator {
-            width: 100%;
-        }
+
         .display-container {
             width: 100%;
-            padding: 0 10px;
-            margin-bottom: 15px;
             cursor: pointer;
         }
-        .display {
-            font-size: 85px;
-            font-weight: 300;
+
+        #display {
+            font-size: 94px; /* 더 큼직하게 */
+            font-weight: 200; /* 더 얇고 세련되게 */
+            color: white;
             text-align: right;
+            margin-bottom: 10px;
+            padding: 0 20px;
+            letter-spacing: -2px;
             transition: font-size 0.15s ease;
             white-space: nowrap;
             overflow: hidden;
         }
-        .buttons {
+
+        .grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 12px; /* 간격을 더 좁히고 정교하게 */
         }
+
         button {
-            aspect-ratio: 1;
+            aspect-ratio: 1 / 1;
             border: none;
             border-radius: 50%;
-            font-size: 32px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: transform 0.1s ease, background-color 0.1s ease;
+            font-size: 36px;
+            font-weight: 400;
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: filter 0.1s, transform 0.1s ease;
+            cursor: pointer;
         }
-        button:active {
-            transform: scale(0.92);
-            filter: brightness(1.3);
-        }
-        .btn-num { background-color: var(--btn-num-bg); color: var(--btn-num-text); }
+
+        /* "0" 버튼: 아이폰 계산기의 핵심 (옆으로 긴 타원) */
         .btn-zero {
             grid-column: span 2;
-            aspect-ratio: initial;
-            height: 100%;
-            border-radius: 50px;
+            aspect-ratio: auto;
+            height: initial;
+            border-radius: 100px;
             justify-content: flex-start;
-            padding-left: 35px;
+            padding-left: 32px;
         }
-        .btn-op { background-color: var(--btn-op-bg); color: var(--btn-op-text); }
-        .btn-misc { background-color: var(--btn-misc-bg); color: var(--btn-misc-text); }
+
+        button:active {
+            filter: brightness(1.8); /* 눌렀을 때 색상이 확 밝아짐 */
+            transform: scale(0.95);
+        }
+
+        /* 색상 배치 */
+        .btn-num { background-color: var(--btn-dark); color: white; }
+        .btn-op { background-color: var(--btn-orange); color: white; font-size: 42px; }
+        .btn-top { background-color: var(--btn-light); color: black; font-size: 30px; }
 
         /* Secret Messenger UI */
         #messenger {
@@ -173,15 +177,15 @@
 </head>
 <body>
 
-    <div class="container">
+    <div class="calc-container">
         <div class="display-container" onclick="handleDisplayTap()">
-            <div class="display">0</div>
+            <div id="display">0</div>
         </div>
         <div id="calculator">
-            <div class="buttons">
-                <button class="btn-misc" onclick="clearDisplay()">AC</button>
-                <button class="btn-misc" onclick="toggleSign()">±</button>
-                <button class="btn-misc" onclick="percentage()">%</button>
+            <div class="grid">
+                <button class="btn-top" onclick="clearDisplay()">AC</button>
+                <button class="btn-top" onclick="toggleSign()">±</button>
+                <button class="btn-top" onclick="percentage()">%</button>
                 <button class="btn-op" onclick="handleOperator('/')">÷</button>
                 
                 <button class="btn-num" onclick="handleNumber('7')">7</button>
@@ -230,7 +234,7 @@
     </div>
 
     <script>
-        const display = document.querySelector('.display');
+        const display = document.querySelector('#display');
         let currentInput = '0';
         let operator = null;
         let previousInput = null;
@@ -245,15 +249,15 @@
             // Auto-scaling font size
             const len = currentInput.length;
             if (len > 9) {
-                display.style.fontSize = '40px';
-            } else if (len > 8) {
                 display.style.fontSize = '50px';
-            } else if (len > 7) {
+            } else if (len > 8) {
                 display.style.fontSize = '60px';
-            } else if (len > 6) {
+            } else if (len > 7) {
                 display.style.fontSize = '70px';
+            } else if (len > 6) {
+                display.style.fontSize = '80px';
             } else {
-                display.style.fontSize = '85px';
+                display.style.fontSize = '94px';
             }
         }
 
