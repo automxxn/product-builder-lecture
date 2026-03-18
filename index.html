@@ -2,55 +2,539 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>313 Student Protection Center - Korea</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>계산기</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --background-color: #000;
+            --display-color: #fff;
+            --btn-num-bg: #333;
+            --btn-num-color: #fff;
+            --btn-op-bg: #f1a33c;
+            --btn-op-color: #fff;
+            --btn-misc-bg: #a5a5a5;
+            --btn-misc-color: #000;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        body {
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 100vh;
+            color: var(--display-color);
+            padding-bottom: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 375px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        #calculator {
+            width: 100%;
+            padding: 0 20px;
+        }
+        .display {
+            font-size: 80px;
+            font-weight: 200;
+            text-align: right;
+            margin-bottom: 20px;
+            padding: 0 10px;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        button {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 50%;
+            font-size: 35px;
+            font-weight: 400;
+            cursor: pointer;
+            outline: none;
+            transition: opacity 0.1s ease-in-out;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:active { opacity: 0.7; }
+        .btn-num { background-color: var(--btn-num-bg); color: var(--btn-num-color); }
+        .btn-zero {
+            grid-column: span 2;
+            aspect-ratio: auto;
+            border-radius: 50px;
+            text-align: left;
+            padding-left: 30px;
+        }
+        .btn-op { background-color: var(--btn-op-bg); color: var(--btn-op-color); }
+        .btn-misc { background-color: var(--btn-misc-bg); color: var(--btn-misc-color); }
+
+        /* Secret Messenger UI */
+        #messenger {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            color: #0f0; /* Green text for spy theme */
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #messenger h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
+        }
+        .login-layer, .device-registration-layer {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            gap: 20px;
+        }
+        .messenger-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            background-color: #111;
+            border: 1px solid #0f0;
+            color: #0f0;
+            font-size: 16px;
+            text-align: center;
+        }
+        .messenger-button {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            background-color: #0f0;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        #chat-ui {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        #message-display {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #0f0;
+            padding: 10px;
+            margin-bottom: 10px;
+            list-style-type: none;
+        }
+        #message-display li {
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+        #message-form {
+            display: flex;
+            gap: 10px;
+        }
+        #message-input {
+            flex-grow: 1;
+        }
+        #exit-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #0f0;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <button id="theme-toggle">Dark Mode</button>
-        <div class="logo">313 Student Protection Center - Korea</div>
-        <nav>
-            <ul>
-                <li><a href="home.html">홈</a></li>
-                <li class="separator"></li>
-                <li><a href="quote.html" target="_blank">학비 환불보험</a></li>
-                <li class="separator"></li>
-                <li><a href="#">미국 건강보험</a></li>
-                <li class="separator"></li>
-                <li><a href="#">가입 안내</a></li>
-                <li class="separator"></li>
-                <li><a href="#">언론보도&미디어</a></li>
-                <li class="separator"></li>
-                <li><a href="#">문의(02-6953-0688)</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section class="hero">
-            <h1>미국 유학, 학비와 의료비 리스크까지 준비하십시오</h1>
-            <p>학비 손실과 의료비 위험을 공식 보험 플랫폼을 통해 대비하십시오</p>
-            <div class="cta-buttons">
-                <a href="quote.html" target="_blank" class="btn">학비 환불보험 바로 가입</a>
-                <button class="btn">건강보험 바로 가입</button>
-            </div>
-        </section>
-    </main>
-    <footer>
-        <div class="footer-content">
-            <div class="company-info">
-                <h2>(주)313교육</h2>
-                <p>서울 서초구 남부순환로 333길 10, 204호</p>
-                <p>TEL: 02-6953-0688</p>
-                <p>E-mail: 313insurance@gmail.com</p>
-                <p>담당자: 문종윤</p>
-            </div>
-            <div class="legal-notice">
-                <h2>법적고지</h2>
-                <p>313 Student Protection Center - Korea는 보험사가 아니며, 미국 보험사(EIP)가 제공하는 보험상품의 가입을 안내하는 공식 지원 플랫폼입니다. 보험 계약은 가입자가 미국 보험사의 공식 온라인 시스템을 통해 직접 체결하며, 보험료 결제 및 보장에 대한 모든 책임은 해당 보험사에 있습니다. 본 사이트는 보험료를 직접 수령하거나 보험계약을 대리 체결하지 않습니다. 보장 범위, 보험금 지급 여부 및 최종 계약 조건은 보험사의 약관에 따르며, 약관 해석 및 보험금 지급 판단은 보험사의 기준이 우선 적용됩니다. 본 사이트는 대한민국 보험업법상 보험 모집 행위를 수행하지 않으며, 해외 보험상품에 대한 정보 제공 및 가입 연결을 지원하는 플랫폼입니다. 보험 가입 전 반드시 보험사의 약관 및 안내 사항을 확인하시기 바랍니다.</p>
+
+    <div class="container">
+        <div id="calculator">
+            <div class="display">0</div>
+            <div class="buttons">
+                <button class="btn-misc" onclick="clearDisplay()">AC</button>
+                <button class="btn-misc" onclick="toggleSign()">±</button>
+                <button class="btn-misc" onclick="percentage()">%</button>
+                <button class="btn-op" onclick="handleOperator('/')">÷</button>
+                <button class="btn-num" onclick="handleNumber('7')">7</button>
+                <button class="btn-num" onclick="handleNumber('8')">8</button>
+                <button class="btn-num" onclick="handleNumber('9')">9</button>
+                <button class="btn-op" onclick="handleOperator('*')">×</button>
+                <button class="btn-num" onclick="handleNumber('4')">4</button>
+                <button class="btn-num" onclick="handleNumber('5')">5</button>
+                <button class="btn-num" onclick="handleNumber('6')">6</button>
+                <button class="btn-op" onclick="handleOperator('-')">-</button>
+                <button class="btn-num" onclick="handleNumber('1')">1</button>
+                <button class="btn-num" onclick="handleNumber('2')">2</button>
+                <button class="btn-num" onclick="handleNumber('3')">3</button>
+                <button class="btn-op" onclick="handleOperator('+')">+</button>
+                <button class="btn-num btn-zero" onclick="handleNumber('0')">0</button>
+                <button class="btn-num" onclick="handleNumber('.')">.</button>
+                <button class="btn-op" onclick="handleEquals()">=</button>
             </div>
         </div>
-    </footer>
-    <script src="main.js"></script>
+    </div>
+
+    <div id="messenger">
+        <button id="exit-button" onclick="exitMessenger()">×</button>
+        <div class="device-registration-layer">
+            <h2>UNREGISTERED DEVICE</h2>
+            <p>To register this device, create a Pre-Shared Key.</p>
+            <input type="password" id="register-psk" class="messenger-input" placeholder="Create a strong PSK">
+            <button class="messenger-button" onclick="registerDevice()">Register Device</button>
+        </div>
+        <div class="login-layer">
+            <h2>SECURE ACCESS</h2>
+            <input type="password" id="login-psk" class="messenger-input" placeholder="Enter Pre-Shared Key">
+            <button class="messenger-button" onclick="login()">Authenticate</button>
+        </div>
+        <div id="chat-ui">
+            <h2>E2EE CHANNEL</h2>
+            <ul id="message-display"></ul>
+            <form id="message-form" action="javascript:void(0);">
+                <input type="text" id="message-input" class="messenger-input" placeholder="Encrypted message...">
+                <button type="submit" class="messenger-button">SEND</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        const display = document.querySelector('.display');
+        let currentInput = '0';
+        let operator = null;
+        let previousInput = null;
+        let shouldResetDisplay = false;
+        let secretTriggerState = 0; // 0: none, 1: 123+, 2: 123+456=
+
+        function updateDisplay() {
+            display.textContent = currentInput;
+        }
+
+        function handleNumber(value) {
+            if (value === '.') {
+                if (secretTriggerState === 2) {
+                    initiateSecretMode();
+                    return;
+                }
+                if (currentInput.includes('.')) return;
+            }
+
+            if (shouldResetDisplay) {
+                currentInput = value;
+                shouldResetDisplay = false;
+            } else {
+                if (currentInput === '0' && value !== '.') {
+                    currentInput = value;
+                } else {
+                    if (currentInput.length < 9) {
+                        currentInput += value;
+                    }
+                }
+            }
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            previousInput = null;
+            operator = null;
+            shouldResetDisplay = false;
+            secretTriggerState = 0;
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            if (currentInput === '0' || currentInput === '') return;
+            currentInput = currentInput.startsWith('-') ? currentInput.slice(1) : '-' + currentInput;
+            updateDisplay();
+        }
+
+        function percentage() {
+            currentInput = (parseFloat(currentInput) / 100).toString();
+            updateDisplay();
+        }
+
+        function handleOperator(op) {
+            if (currentInput === '123' && op === '+') {
+                secretTriggerState = 1;
+            } else {
+                secretTriggerState = 0;
+            }
+            if (operator && !shouldResetDisplay) {
+                handleEquals();
+            }
+            operator = op;
+            previousInput = currentInput;
+            shouldResetDisplay = true;
+        }
+
+        function handleEquals() {
+            if (!operator || previousInput === null) return;
+            
+            if (secretTriggerState === 1 && previousInput === '123' && currentInput === '456' && operator === '+') {
+                secretTriggerState = 2;
+                currentInput = '777'; // Show a fake result
+                updateDisplay();
+                operator = null;
+                previousInput = null;
+                shouldResetDisplay = true;
+                return;
+            }
+
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            let result;
+            switch (operator) {
+                case '+': result = prev + current; break;
+                case '-': result = prev - current; break;
+                case '*': result = prev * current; break;
+                case '/': result = prev / current; break;
+                default: return;
+            }
+            currentInput = result.toString().slice(0, 9);
+            operator = null;
+            previousInput = null;
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+        
+        // --- SECRET MESSENGER LOGIC ---
+        
+        const messengerUI = document.getElementById('messenger');
+        const deviceRegistrationLayer = document.querySelector('.device-registration-layer');
+        const loginLayer = document.querySelector('.login-layer');
+        const chatUI = document.getElementById('chat-ui');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const messageDisplay = document.getElementById('message-display');
+
+        let encryptionKey = null;
+        let firebaseDb = null;
+
+        // [PLACEHOLDER] Replace with your Firebase project's configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // E2EE Functions (using Web Crypto API)
+        async function generateDeviceId() {
+            const { userAgent, language, hardwareConcurrency, deviceMemory } = navigator;
+            const screen = window.screen;
+            const fingerprint = `${userAgent}${language}${hardwareConcurrency}${deviceMemory}${screen.width}${screen.height}${screen.colorDepth}`;
+            
+            const encoder = new TextEncoder();
+            const data = encoder.encode(fingerprint);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        async function deriveKeyFromPSK(psk, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw', enc.encode(psk), 'PBKDF2', false, ['deriveKey']
+            );
+            return crypto.subtle.deriveKey(
+                { name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                true,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        async function encryptMessage(text, key) {
+            const enc = new TextEncoder();
+            const iv = crypto.getRandomValues(new Uint8Array(12)); // Initialization Vector
+            const ciphertext = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv: iv },
+                key,
+                enc.encode(text)
+            );
+            // Combine IV and ciphertext for storage/transmission
+            const ivAndCiphertext = new Uint8Array(iv.length + ciphertext.byteLength);
+            ivAndCiphertext.set(iv);
+            ivAndCiphertext.set(new Uint8Array(ciphertext), iv.length);
+            return btoa(String.fromCharCode.apply(null, ivAndCiphertext)); // Base64 encode
+        }
+
+        async function decryptMessage(b64Ciphertext, key) {
+            try {
+                const ivAndCiphertext = new Uint8Array(atob(b64Ciphertext).split('').map(c => c.charCodeAt(0)));
+                const iv = ivAndCiphertext.slice(0, 12);
+                const ciphertext = ivAndCiphertext.slice(12);
+
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: iv },
+                    key,
+                    ciphertext
+                );
+                const dec = new TextDecoder();
+                return dec.decode(decrypted);
+            } catch (e) {
+                console.error("Decryption failed:", e);
+                return "[DECRYPTION FAILED]";
+            }
+        }
+        
+        // Messenger UI/UX Functions
+        async function initiateSecretMode() {
+            messengerUI.style.display = 'flex';
+            const deviceId = await generateDeviceId();
+            const registeredDeviceId = localStorage.getItem('deviceId');
+
+            if (deviceId === registeredDeviceId) {
+                // Device is recognized
+                deviceRegistrationLayer.style.display = 'none';
+                loginLayer.style.display = 'flex';
+                chatUI.style.display = 'none';
+            } else {
+                // New device
+                deviceRegistrationLayer.style.display = 'flex';
+                loginLayer.style.display = 'none';
+                chatUI.style.display = 'none';
+            }
+            clearDisplay(); // Reset calculator state
+        }
+        
+        async function registerDevice() {
+            const pskInput = document.getElementById('register-psk');
+            if (pskInput.value.length < 8) {
+                alert('Pre-Shared Key must be at least 8 characters long.');
+                return;
+            }
+            const deviceId = await generateDeviceId();
+            localStorage.setItem('deviceId', deviceId);
+            alert('Device registered successfully.');
+            initiateSecretMode();
+        }
+
+        async function login() {
+            const pskInput = document.getElementById('login-psk');
+            const psk = pskInput.value;
+            if (!psk) {
+                alert('PSK is required.');
+                return;
+            }
+            
+            try {
+                const deviceId = await generateDeviceId();
+                encryptionKey = await deriveKeyFromPSK(psk, deviceId); // Use deviceId as salt
+                
+                // Initialize Firebase
+                if (firebase.apps.length === 0) {
+                  firebase.initializeApp(firebaseConfig);
+                }
+                firebaseDb = firebase.database();
+
+                // Show chat UI
+                loginLayer.style.display = 'none';
+                chatUI.style.display = 'flex';
+                
+                // Start listening for messages
+                listenForMessages();
+
+            } catch (error) {
+                console.error("Login failed (deriving key):", error);
+                alert("Authentication failed. Check your PSK.");
+            }
+        }
+        
+        async function sendMessage() {
+            const text = messageInput.value;
+            if (text.trim() === '' || !encryptionKey || !firebaseDb) return;
+            
+            try {
+                const encryptedText = await encryptMessage(text, encryptionKey);
+                firebaseDb.ref('messages').push({
+                    ct: encryptedText, // ciphertext
+                    ts: firebase.database.ServerValue.TIMESTAMP // timestamp
+                });
+                messageInput.value = '';
+            } catch (error) {
+                console.error("Error sending message:", error);
+                alert("Failed to send encrypted message.");
+            }
+        }
+
+        function listenForMessages() {
+            const messagesRef = firebaseDb.ref('messages');
+            messagesRef.on('child_added', async (snapshot) => {
+                const msgData = snapshot.val();
+                if (msgData && msgData.ct) {
+                    const decryptedText = await decryptMessage(msgData.ct, encryptionKey);
+                    if (decryptedText !== "[DECRYPTION FAILED]") {
+                        displayMessage(decryptedText);
+                        // Message is read, now delete it from the server
+                        snapshot.ref.remove();
+                    } else {
+                        // If decryption fails, remove the garbled message
+                        displayMessage("[DECRYPTION FAILED - MESSAGE DELETED]");
+                        snapshot.ref.remove();
+                    }
+                }
+            });
+        }
+        
+        function displayMessage(text) {
+            const li = document.createElement('li');
+            li.textContent = text;
+            messageDisplay.appendChild(li);
+            messageDisplay.scrollTop = messageDisplay.scrollHeight; // Auto-scroll
+        }
+        
+        function exitMessenger() {
+            // Clean up
+            if (firebaseDb) {
+                firebaseDb.ref('messages').off(); // Stop listening
+            }
+            encryptionKey = null;
+            firebaseDb = null;
+            
+            // Clear UI
+            document.getElementById('login-psk').value = '';
+            document.getElementById('register-psk').value = '';
+            messageInput.value = '';
+            messageDisplay.innerHTML = '';
+
+            // Hide messenger
+            messengerUI.style.display = 'none';
+        }
+
+        messageForm.addEventListener('submit', sendMessage);
+
+    </script>
 </body>
 </html>
