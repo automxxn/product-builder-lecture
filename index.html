@@ -2,86 +2,102 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>계산기</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
         :root {
-            --background-color: #000;
-            --display-color: #fff;
-            --btn-num-bg: #333;
-            --btn-num-color: #fff;
-            --btn-op-bg: #f1a33c;
-            --btn-op-color: #fff;
-            --btn-misc-bg: #a5a5a5;
-            --btn-misc-color: #000;
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --btn-num-bg: #333333;
+            --btn-num-text: #ffffff;
+            --btn-op-bg: #FF9F0A;
+            --btn-op-text: #ffffff;
+            --btn-misc-bg: #A5A5A5;
+            --btn-misc-text: #000000;
+            --safe-area-top: env(safe-area-inset-top);
+            --safe-area-bottom: env(safe-area-inset-bottom);
         }
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
         body {
-            background-color: var(--background-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            height: 100vh;
-            color: var(--display-color);
-            padding-bottom: 20px;
+            padding: var(--safe-area-top) 0 var(--safe-area-bottom) 0;
+            overflow: hidden;
         }
         .container {
             width: 100%;
-            max-width: 375px;
-            height: 100%;
+            max-width: 400px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
+            height: 100%;
         }
         #calculator {
             width: 100%;
-            padding: 0 20px;
+        }
+        .display-container {
+            width: 100%;
+            padding: 0 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
         }
         .display {
-            font-size: 80px;
-            font-weight: 200;
+            font-size: 85px;
+            font-weight: 300;
             text-align: right;
-            margin-bottom: 20px;
-            padding: 0 10px;
-            word-wrap: break-word;
-            word-break: break-all;
+            transition: font-size 0.15s ease;
+            white-space: nowrap;
+            overflow: hidden;
         }
         .buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
+            gap: 15px;
         }
         button {
             aspect-ratio: 1;
             border: none;
             border-radius: 50%;
-            font-size: 35px;
-            font-weight: 400;
+            font-size: 32px;
+            font-weight: 500;
             cursor: pointer;
-            outline: none;
-            transition: opacity 0.1s ease-in-out;
-            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s ease, background-color 0.1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        button:active { opacity: 0.7; }
-        .btn-num { background-color: var(--btn-num-bg); color: var(--btn-num-color); }
+        button:active {
+            transform: scale(0.92);
+            filter: brightness(1.3);
+        }
+        .btn-num { background-color: var(--btn-num-bg); color: var(--btn-num-text); }
         .btn-zero {
             grid-column: span 2;
-            aspect-ratio: auto;
+            aspect-ratio: initial;
+            height: 100%;
             border-radius: 50px;
-            text-align: left;
-            padding-left: 30px;
+            justify-content: flex-start;
+            padding-left: 35px;
         }
-        .btn-op { background-color: var(--btn-op-bg); color: var(--btn-op-color); }
-        .btn-misc { background-color: var(--btn-misc-bg); color: var(--btn-misc-color); }
+        .btn-op { background-color: var(--btn-op-bg); color: var(--btn-op-text); }
+        .btn-misc { background-color: var(--btn-misc-bg); color: var(--btn-misc-text); }
 
         /* Secret Messenger UI */
         #messenger {
@@ -91,80 +107,66 @@
             width: 100%;
             height: 100%;
             background-color: #000;
-            z-index: 100;
+            z-index: 1000;
             display: none;
             flex-direction: column;
-            padding: 20px;
-            color: #0f0; /* Green text for spy theme */
-            font-family: 'Courier New', Courier, monospace;
-        }
-        #messenger h2 {
-            text-align: center;
-            margin-bottom: 20px;
+            padding: 60px 20px 20px 20px;
             color: #0f0;
-            text-shadow: 0 0 5px #0f0;
+            font-family: 'SF Mono', 'Courier New', monospace;
         }
+        #messenger h2 { text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
         .login-layer, .device-registration-layer {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100%;
-            gap: 20px;
+            height: 60%;
+            gap: 25px;
         }
         .messenger-input {
             width: 100%;
-            max-width: 300px;
-            padding: 10px;
+            max-width: 320px;
+            padding: 15px;
             background-color: #111;
             border: 1px solid #0f0;
             color: #0f0;
-            font-size: 16px;
+            font-size: 18px;
             text-align: center;
+            border-radius: 8px;
+            outline: none;
         }
         .messenger-button {
             width: 100%;
-            max-width: 300px;
-            padding: 10px;
+            max-width: 320px;
+            padding: 15px;
             background-color: #0f0;
             color: #000;
             border: none;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
+            border-radius: 8px;
         }
-        #chat-ui {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-        }
+        #chat-ui { display: none; flex-direction: column; height: 100%; }
         #message-display {
             flex-grow: 1;
             overflow-y: auto;
             border: 1px solid #0f0;
-            padding: 10px;
-            margin-bottom: 10px;
-            list-style-type: none;
+            padding: 15px;
+            margin-bottom: 15px;
+            list-style: none;
+            border-radius: 8px;
         }
-        #message-display li {
-            margin-bottom: 8px;
-            word-wrap: break-word;
-        }
-        #message-form {
-            display: flex;
-            gap: 10px;
-        }
-        #message-input {
-            flex-grow: 1;
-        }
+        #message-display li { margin-bottom: 10px; line-height: 1.4; word-break: break-all; }
+        #message-form { display: flex; gap: 10px; }
         #exit-button {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 40px;
+            right: 25px;
             background: none;
             border: none;
             color: #0f0;
-            font-size: 24px;
+            font-size: 35px;
             cursor: pointer;
         }
     </style>
@@ -172,25 +174,31 @@
 <body>
 
     <div class="container">
-        <div id="calculator">
+        <div class="display-container" onclick="handleDisplayTap()">
             <div class="display">0</div>
+        </div>
+        <div id="calculator">
             <div class="buttons">
                 <button class="btn-misc" onclick="clearDisplay()">AC</button>
                 <button class="btn-misc" onclick="toggleSign()">±</button>
                 <button class="btn-misc" onclick="percentage()">%</button>
                 <button class="btn-op" onclick="handleOperator('/')">÷</button>
+                
                 <button class="btn-num" onclick="handleNumber('7')">7</button>
                 <button class="btn-num" onclick="handleNumber('8')">8</button>
                 <button class="btn-num" onclick="handleNumber('9')">9</button>
                 <button class="btn-op" onclick="handleOperator('*')">×</button>
+                
                 <button class="btn-num" onclick="handleNumber('4')">4</button>
                 <button class="btn-num" onclick="handleNumber('5')">5</button>
                 <button class="btn-num" onclick="handleNumber('6')">6</button>
-                <button class="btn-op" onclick="handleOperator('-')">-</button>
+                <button class="btn-op" onclick="handleOperator('-')">−</button>
+                
                 <button class="btn-num" onclick="handleNumber('1')">1</button>
                 <button class="btn-num" onclick="handleNumber('2')">2</button>
                 <button class="btn-num" onclick="handleNumber('3')">3</button>
                 <button class="btn-op" onclick="handleOperator('+')">+</button>
+                
                 <button class="btn-num btn-zero" onclick="handleNumber('0')">0</button>
                 <button class="btn-num" onclick="handleNumber('.')">.</button>
                 <button class="btn-op" onclick="handleEquals()">=</button>
@@ -201,26 +209,25 @@
     <div id="messenger">
         <button id="exit-button" onclick="exitMessenger()">×</button>
         <div class="device-registration-layer">
-            <h2>UNREGISTERED DEVICE</h2>
-            <p>To register this device, create a Pre-Shared Key.</p>
-            <input type="password" id="register-psk" class="messenger-input" placeholder="Create a strong PSK">
-            <button class="messenger-button" onclick="registerDevice()">Register Device</button>
+            <h2>NEW DEVICE</h2>
+            <p style="text-align:center; font-size:14px;">Establish a Pre-Shared Key.</p>
+            <input type="password" id="register-psk" class="messenger-input" placeholder="Min 8 chars">
+            <button class="messenger-button" onclick="registerDevice()">Register</button>
         </div>
         <div class="login-layer">
-            <h2>SECURE ACCESS</h2>
-            <input type="password" id="login-psk" class="messenger-input" placeholder="Enter Pre-Shared Key">
-            <button class="messenger-button" onclick="login()">Authenticate</button>
+            <h2>AUTHENTICATE</h2>
+            <input type="password" id="login-psk" class="messenger-input" placeholder="PSK">
+            <button class="messenger-button" onclick="login()">Access</button>
         </div>
         <div id="chat-ui">
             <h2>E2EE CHANNEL</h2>
             <ul id="message-display"></ul>
             <form id="message-form" action="javascript:void(0);">
-                <input type="text" id="message-input" class="messenger-input" placeholder="Encrypted message...">
-                <button type="submit" class="messenger-button">SEND</button>
+                <input type="text" id="message-input" class="messenger-input" placeholder="Secure msg..." style="text-align:left;">
+                <button type="submit" class="messenger-button" style="width: 80px;">SEND</button>
             </form>
         </div>
     </div>
-
 
     <script>
         const display = document.querySelector('.display');
@@ -228,10 +235,26 @@
         let operator = null;
         let previousInput = null;
         let shouldResetDisplay = false;
-        let secretTriggerState = 0; // 0: none, 1: 123+, 2: 123+456=
+        let secretTriggerState = 0; 
+        let displayTapCount = 0;
+        let displayTapTimer = null;
 
         function updateDisplay() {
             display.textContent = currentInput;
+            
+            // Auto-scaling font size
+            const len = currentInput.length;
+            if (len > 9) {
+                display.style.fontSize = '40px';
+            } else if (len > 8) {
+                display.style.fontSize = '50px';
+            } else if (len > 7) {
+                display.style.fontSize = '60px';
+            } else if (len > 6) {
+                display.style.fontSize = '70px';
+            } else {
+                display.style.fontSize = '85px';
+            }
         }
 
         function handleNumber(value) {
@@ -250,7 +273,7 @@
                 if (currentInput === '0' && value !== '.') {
                     currentInput = value;
                 } else {
-                    if (currentInput.length < 9) {
+                    if (currentInput.replace(/[.-]/g, '').length < 9) {
                         currentInput += value;
                     }
                 }
@@ -268,13 +291,13 @@
         }
 
         function toggleSign() {
-            if (currentInput === '0' || currentInput === '') return;
+            if (currentInput === '0') return;
             currentInput = currentInput.startsWith('-') ? currentInput.slice(1) : '-' + currentInput;
             updateDisplay();
         }
 
         function percentage() {
-            currentInput = (parseFloat(currentInput) / 100).toString();
+            currentInput = (parseFloat(currentInput) / 100).toString().slice(0, 12);
             updateDisplay();
         }
 
@@ -284,6 +307,7 @@
             } else {
                 secretTriggerState = 0;
             }
+            
             if (operator && !shouldResetDisplay) {
                 handleEquals();
             }
@@ -297,7 +321,7 @@
             
             if (secretTriggerState === 1 && previousInput === '123' && currentInput === '456' && operator === '+') {
                 secretTriggerState = 2;
-                currentInput = '777'; // Show a fake result
+                currentInput = '777'; 
                 updateDisplay();
                 operator = null;
                 previousInput = null;
@@ -315,15 +339,31 @@
                 case '/': result = prev / current; break;
                 default: return;
             }
-            currentInput = result.toString().slice(0, 9);
+            
+            currentInput = result.toString();
+            if (currentInput.length > 12) currentInput = result.toPrecision(8);
+            
             operator = null;
             previousInput = null;
             shouldResetDisplay = true;
             updateDisplay();
         }
+
+        async function handleDisplayTap() {
+            displayTapCount++;
+            clearTimeout(displayTapTimer);
+            displayTapTimer = setTimeout(() => {
+                displayTapCount = 0;
+            }, 1500);
+
+            if (displayTapCount === 5) {
+                const deviceId = await generateDeviceId();
+                alert("Device ID: " + deviceId);
+                displayTapCount = 0;
+            }
+        }
         
         // --- SECRET MESSENGER LOGIC ---
-        
         const messengerUI = document.getElementById('messenger');
         const deviceRegistrationLayer = document.querySelector('.device-registration-layer');
         const loginLayer = document.querySelector('.login-layer');
@@ -335,7 +375,6 @@
         let encryptionKey = null;
         let firebaseDb = null;
 
-        // [PLACEHOLDER] Replace with your Firebase project's configuration
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
@@ -346,26 +385,20 @@
             appId: "YOUR_APP_ID"
         };
         
-        // E2EE Functions (using Web Crypto API)
         async function generateDeviceId() {
             const { userAgent, language, hardwareConcurrency, deviceMemory } = navigator;
             const screen = window.screen;
             const fingerprint = `${userAgent}${language}${hardwareConcurrency}${deviceMemory}${screen.width}${screen.height}${screen.colorDepth}`;
-            
             const encoder = new TextEncoder();
             const data = encoder.encode(fingerprint);
             const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            
             const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            return hashHex;
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         async function deriveKeyFromPSK(psk, salt) {
             const enc = new TextEncoder();
-            const keyMaterial = await crypto.subtle.importKey(
-                'raw', enc.encode(psk), 'PBKDF2', false, ['deriveKey']
-            );
+            const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(psk), 'PBKDF2', false, ['deriveKey']);
             return crypto.subtle.deriveKey(
                 { name: 'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash: 'SHA-256' },
                 keyMaterial,
@@ -377,17 +410,12 @@
 
         async function encryptMessage(text, key) {
             const enc = new TextEncoder();
-            const iv = crypto.getRandomValues(new Uint8Array(12)); // Initialization Vector
-            const ciphertext = await crypto.subtle.encrypt(
-                { name: 'AES-GCM', iv: iv },
-                key,
-                enc.encode(text)
-            );
-            // Combine IV and ciphertext for storage/transmission
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, enc.encode(text));
             const ivAndCiphertext = new Uint8Array(iv.length + ciphertext.byteLength);
             ivAndCiphertext.set(iv);
             ivAndCiphertext.set(new Uint8Array(ciphertext), iv.length);
-            return btoa(String.fromCharCode.apply(null, ivAndCiphertext)); // Base64 encode
+            return btoa(String.fromCharCode.apply(null, ivAndCiphertext));
         }
 
         async function decryptMessage(b64Ciphertext, key) {
@@ -395,97 +423,67 @@
                 const ivAndCiphertext = new Uint8Array(atob(b64Ciphertext).split('').map(c => c.charCodeAt(0)));
                 const iv = ivAndCiphertext.slice(0, 12);
                 const ciphertext = ivAndCiphertext.slice(12);
-
-                const decrypted = await crypto.subtle.decrypt(
-                    { name: 'AES-GCM', iv: iv },
-                    key,
-                    ciphertext
-                );
-                const dec = new TextDecoder();
-                return dec.decode(decrypted);
+                const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ciphertext);
+                return new TextDecoder().decode(decrypted);
             } catch (e) {
-                console.error("Decryption failed:", e);
                 return "[DECRYPTION FAILED]";
             }
         }
         
-        // Messenger UI/UX Functions
         async function initiateSecretMode() {
             messengerUI.style.display = 'flex';
             const deviceId = await generateDeviceId();
             const registeredDeviceId = localStorage.getItem('deviceId');
-
             if (deviceId === registeredDeviceId) {
-                // Device is recognized
                 deviceRegistrationLayer.style.display = 'none';
                 loginLayer.style.display = 'flex';
                 chatUI.style.display = 'none';
             } else {
-                // New device
                 deviceRegistrationLayer.style.display = 'flex';
                 loginLayer.style.display = 'none';
                 chatUI.style.display = 'none';
             }
-            clearDisplay(); // Reset calculator state
+            clearDisplay();
         }
         
         async function registerDevice() {
             const pskInput = document.getElementById('register-psk');
             if (pskInput.value.length < 8) {
-                alert('Pre-Shared Key must be at least 8 characters long.');
+                alert('Min 8 characters required.');
                 return;
             }
             const deviceId = await generateDeviceId();
             localStorage.setItem('deviceId', deviceId);
-            alert('Device registered successfully.');
+            alert('Device Authenticated.');
             initiateSecretMode();
         }
 
         async function login() {
             const pskInput = document.getElementById('login-psk');
             const psk = pskInput.value;
-            if (!psk) {
-                alert('PSK is required.');
-                return;
-            }
-            
+            if (!psk) return;
             try {
                 const deviceId = await generateDeviceId();
-                encryptionKey = await deriveKeyFromPSK(psk, deviceId); // Use deviceId as salt
-                
-                // Initialize Firebase
-                if (firebase.apps.length === 0) {
-                  firebase.initializeApp(firebaseConfig);
-                }
+                encryptionKey = await deriveKeyFromPSK(psk, deviceId);
+                if (firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
                 firebaseDb = firebase.database();
-
-                // Show chat UI
                 loginLayer.style.display = 'none';
                 chatUI.style.display = 'flex';
-                
-                // Start listening for messages
                 listenForMessages();
-
             } catch (error) {
-                console.error("Login failed (deriving key):", error);
-                alert("Authentication failed. Check your PSK.");
+                alert("Auth Error.");
             }
         }
         
         async function sendMessage() {
             const text = messageInput.value;
             if (text.trim() === '' || !encryptionKey || !firebaseDb) return;
-            
             try {
                 const encryptedText = await encryptMessage(text, encryptionKey);
-                firebaseDb.ref('messages').push({
-                    ct: encryptedText, // ciphertext
-                    ts: firebase.database.ServerValue.TIMESTAMP // timestamp
-                });
+                firebaseDb.ref('messages').push({ ct: encryptedText, ts: firebase.database.ServerValue.TIMESTAMP });
                 messageInput.value = '';
             } catch (error) {
-                console.error("Error sending message:", error);
-                alert("Failed to send encrypted message.");
+                alert("Send fail.");
             }
         }
 
@@ -497,11 +495,9 @@
                     const decryptedText = await decryptMessage(msgData.ct, encryptionKey);
                     if (decryptedText !== "[DECRYPTION FAILED]") {
                         displayMessage(decryptedText);
-                        // Message is read, now delete it from the server
                         snapshot.ref.remove();
                     } else {
-                        // If decryption fails, remove the garbled message
-                        displayMessage("[DECRYPTION FAILED - MESSAGE DELETED]");
+                        displayMessage("[GARBLED DATA DELETED]");
                         snapshot.ref.remove();
                     }
                 }
@@ -510,31 +506,23 @@
         
         function displayMessage(text) {
             const li = document.createElement('li');
-            li.textContent = text;
+            li.textContent = "> " + text;
             messageDisplay.appendChild(li);
-            messageDisplay.scrollTop = messageDisplay.scrollHeight; // Auto-scroll
+            messageDisplay.scrollTop = messageDisplay.scrollHeight;
         }
         
         function exitMessenger() {
-            // Clean up
-            if (firebaseDb) {
-                firebaseDb.ref('messages').off(); // Stop listening
-            }
+            if (firebaseDb) firebaseDb.ref('messages').off();
             encryptionKey = null;
             firebaseDb = null;
-            
-            // Clear UI
             document.getElementById('login-psk').value = '';
             document.getElementById('register-psk').value = '';
             messageInput.value = '';
             messageDisplay.innerHTML = '';
-
-            // Hide messenger
             messengerUI.style.display = 'none';
         }
 
         messageForm.addEventListener('submit', sendMessage);
-
     </script>
 </body>
 </html>
